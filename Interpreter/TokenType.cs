@@ -11,20 +11,21 @@ namespace Interpreter
         LEFT_PAREN, RIGHT_PAREN, //( )
         LEFT_BRACE, RIGHT_BRACE, //[]   
 
-        COMMA, EQUALS, COLON,  // , . * :
+        COMMA, EQUALS, COLON,  // , =  :
         SHARP, AMPERSAND, //# &
-        MULT, ADD, SUBT, DIV, MOD,
+        MULT, ADD, SUBT, DIV, MOD, //* + - / %
+
 
         GREATER, LESSER, // > <
         GREATER_EQUAL, LESSER_EQUAL, // >= <=
 
-        EQUAL, NOT_EQUAL, // == <>
+        EQUAL, NOT_EQUAL, // = == <>
 
 
         IDENTIFIER, //^([A-Za-z+_+$][A-Za-z+_+$]*)
         CHAR_LIT, //^('.*')
-        INT_LIT,  //^((-)[0-9]{1,32})
-        FLOAT_LIT,  //^() ambot unsay regex ani
+        INT_LIT,  //^([+-]?[0-9]+)
+        FLOAT_LIT,  //^([+-]?([0-9]*[.])?[0-9]+) 
         BOOL_LIT,  //^(TRUE|FALSE)
 
             //RESERVED WORDS
