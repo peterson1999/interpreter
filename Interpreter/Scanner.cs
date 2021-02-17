@@ -190,7 +190,6 @@ namespace Interpreter
             string temp = "";
             while (isAlpha(a) || isDigit(a))
             {
-                Console.WriteLine(a);
                 temp += a;
                 a = NextChar();
                 char_counter++;
@@ -235,7 +234,7 @@ namespace Interpreter
                 return source;
             }    
         }
-
+        //Used only to check if token list data are correct
         public List<Token> Tokens
         {
             get
