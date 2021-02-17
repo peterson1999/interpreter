@@ -19,11 +19,11 @@ namespace Interpreter
         {
             tokens = new List<Token>();
             this.source = source.Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
-            line = 1;
+            line = 0;
             char_counter = 0;
             currString = "";
         }
-        public bool Process()
+        public void Process()
         {
             int i = 0;
             while (i < source.Length)
@@ -31,13 +31,8 @@ namespace Interpreter
                 ProccessLine();
                 i++;
                 line++;
+                char_counter = 0;
             }
-            if (line >= source.Length)
-            {
-                return true;
-            }
-            else
-                return false ;
         }
 
         public char NextChar()
@@ -50,12 +45,12 @@ namespace Interpreter
 
         public void ProccessLine()
         {
-            currString = source[line-1];
+            currString = source[line];
             charArrLength = currString.Length;
             while (char_counter < charArrLength)
             {
-                Console.WriteLine("{0}, {1}", charArrLength, char_counter);
                 char a = currString[char_counter];
+                Console.WriteLine(a);
                 switch (a)
                 {
                     case '+':
@@ -167,8 +162,8 @@ namespace Interpreter
             while (isDigit(a))
             {
                 temp += a;
-                char_counter++;
                 a = NextChar();
+                char_counter++;
             }
             if (a == '.')
             {
@@ -178,8 +173,8 @@ namespace Interpreter
                 while (isDigit(a))
                 {
                     temp += a;
-                    char_counter++;
                     a = NextChar();
+                    char_counter++;
                 }
                 
             }
@@ -195,9 +190,10 @@ namespace Interpreter
             string temp = "";
             while (isAlpha(a) || isDigit(a))
             {
+                Console.WriteLine(a);
                 temp += a;
-                char_counter++;
                 a = NextChar();
+                char_counter++;
             }
             switch (temp)
             {
@@ -238,6 +234,14 @@ namespace Interpreter
             {
                 return source;
             }    
+        }
+
+        public List<Token> Tokens
+        {
+            get
+            {
+                return tokens;
+            }
         }
     }
 }
