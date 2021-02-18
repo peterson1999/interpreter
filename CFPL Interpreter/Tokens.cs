@@ -4,16 +4,16 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Interpreter
+namespace CFPL_Interpreter
 {
-    class Token
+    class Tokens
     {
         private TokenType type;
         private String lexeme;
         private Object literal;
         private int line;
 
-        public Token(TokenType type, String lexeme, Object literal, int line)
+        public Tokens(TokenType type, String lexeme, Object literal, int line)
         {
             this.type = type;
             this.lexeme = lexeme;
@@ -21,7 +21,8 @@ namespace Interpreter
             this.line = line;
         }
 
-        public TokenType Type{
+        public TokenType Type
+        {
             get
             {
                 return type;
@@ -44,7 +45,7 @@ namespace Interpreter
                 return literal;
             }
         }
-        
+
         public int Line
         {
             get

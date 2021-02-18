@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Interpreter.Properties
+namespace CFPL_Interpreter.Properties
 {
 
 
