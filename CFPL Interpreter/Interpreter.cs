@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Interpreter
+namespace CFPL_Interpreter
 {
     class Interpreter
     {
@@ -15,9 +15,9 @@ namespace Interpreter
         private static bool varAfterStart;
         private Dictionary<string, object> map;
 
-        public Interpreter(List<Token> t)
+        public Interpreter(List<Tokens> t)
         {
-            tokens = new List<Token>(t);
+            tokens = new List<Tokens>(t);
             map = new Dictionary<string, object>();
             tCounter = 0;
             hasStart = hasStop = varAfterStart=  false;
