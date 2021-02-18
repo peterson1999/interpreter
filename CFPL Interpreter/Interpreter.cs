@@ -8,7 +8,7 @@ namespace Interpreter
 {
     class Interpreter
     {
-        private List<Token> tokens;
+        private List<Tokens> tokens;
         private static bool hasStop;
         private static bool hasStart;
         private static int tCounter;
