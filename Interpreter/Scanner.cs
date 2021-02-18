@@ -130,14 +130,6 @@ namespace Interpreter
                         tokens.Add(new Token(TokenType.MOD, a.ToString(), null, line));
                         char_counter++;
                         break;
-                    case ';': if (char_counter != charArrLength)
-                              {
-                                //error statement here
-                                char_counter++;
-                                break;
-                              }
-                        char_counter++;
-                        break;
                     default:
                         if (isDigit(a))
                         {
