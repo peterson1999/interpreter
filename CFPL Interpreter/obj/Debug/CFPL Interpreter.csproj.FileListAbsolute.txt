@@ -1,0 +1,13 @@
+C:\Users\kits\source\repos\CFPL Interpreter\CFPL Interpreter\bin\Debug\CFPL Interpreter.exe.config
+C:\Users\kits\source\repos\CFPL Interpreter\CFPL Interpreter\bin\Debug\CFPL Interpreter.exe
+C:\Users\kits\source\repos\CFPL Interpreter\CFPL Interpreter\bin\Debug\CFPL Interpreter.pdb
+C:\Users\kits\source\repos\CFPL Interpreter\CFPL Interpreter\obj\Debug\CFPL Interpreter.csprojAssemblyReference.cache
+C:\Users\kits\source\repos\CFPL Interpreter\CFPL Interpreter\obj\Debug\CFPL_Interpreter.Form1.resources
+C:\Users\kits\source\repos\CFPL Interpreter\CFPL Interpreter\obj\Debug\CFPL_Interpreter.Properties.Resources.resources
+C:\Users\kits\source\repos\CFPL Interpreter\CFPL Interpreter\obj\Debug\CFPL Interpreter.csproj.GenerateResource.cache
+C:\Users\kits\source\repos\CFPL Interpreter\CFPL Interpreter\obj\Debug\CFPL Interpreter.exe
+C:\Users\kits\source\repos\CFPL Interpreter\CFPL Interpreter\obj\Debug\CFPL Interpreter.pdb
+C:\Users\kits\source\repos\CFPL Interpreter\CFPL Interpreter\bin\Debug\FastColoredTextBox.dll
+C:\Users\kits\source\repos\CFPL Interpreter\CFPL Interpreter\bin\Debug\FastColoredTextBox.xml
+C:\Users\kits\source\repos\CFPL Interpreter\CFPL Interpreter\obj\Debug\CFPL Interpreter.csproj.CopyComplete
+C:\Users\kits\source\repos\CFPL Interpreter\CFPL Interpreter\bin\Debug\TabStrip.dll

@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Interpreter
+namespace CFPL_Interpreter
 {
     class Scanner
     {
         private readonly string[] source;
-        private readonly List<Token> tokens;
+        private readonly List<Tokens> tokens;
         private static string currString;
         private static int charArrLength;
         private static int char_counter;
@@ -17,7 +17,7 @@ namespace Interpreter
 
         public Scanner(string source)
         {
-            tokens = new List<Token>();
+            tokens = new List<Tokens>();
             this.source = source.Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
             line = 0;
             char_counter = 0;
@@ -54,51 +54,51 @@ namespace Interpreter
                 switch (a)
                 {
                     case '+':
-                        tokens.Add(new Token(TokenType.ADD, a.ToString(), null, line));
+                        tokens.Add(new Tokens(TokenType.ADD, a.ToString(), null, line));
                         char_counter++;
                         break;
                     case '-':
-                        tokens.Add(new Token(TokenType.SUBT, a.ToString(), null, line));
+                        tokens.Add(new Tokens(TokenType.SUBT, a.ToString(), null, line));
                         char_counter++;
                         break;
                     case '/':
-                        tokens.Add(new Token(TokenType.DIV, a.ToString(), null, line));
+                        tokens.Add(new Tokens(TokenType.DIV, a.ToString(), null, line));
                         char_counter++;
                         break;
                     case '*':
-                        tokens.Add(new Token(TokenType.MULT, a.ToString(), null, line));
+                        tokens.Add(new Tokens(TokenType.MULT, a.ToString(), null, line));
                         char_counter++;
                         break;
                     case '(':
-                        tokens.Add(new Token(TokenType.LEFT_PAREN, a.ToString(), null, line));
+                        tokens.Add(new Tokens(TokenType.LEFT_PAREN, a.ToString(), null, line));
                         char_counter++;
                         break;
                     case ')':
-                        tokens.Add(new Token(TokenType.RIGHT_PAREN, a.ToString(), null, line));
+                        tokens.Add(new Tokens(TokenType.RIGHT_PAREN, a.ToString(), null, line));
                         char_counter++;
                         break;
                     case '>':
                         if (NextChar() == '=')
                         {
-                            string temp = ""+a + NextChar();
-                            tokens.Add(new Token(TokenType.GREATER_EQUAL, temp, null, line));
+                            string temp = "" + a + NextChar();
+                            tokens.Add(new Tokens(TokenType.GREATER_EQUAL, temp, null, line));
                             char_counter += 2;
                         }
                         else
                         {
-                            tokens.Add(new Token(TokenType.GREATER, a.ToString(), null, line));
+                            tokens.Add(new Tokens(TokenType.GREATER, a.ToString(), null, line));
                         }
                         break;
                     case '<':
                         if (NextChar() == '=')
                         {
                             string temp = "" + a + NextChar();
-                            tokens.Add(new Token(TokenType.LESSER_EQUAL, temp, null, line));
+                            tokens.Add(new Tokens(TokenType.LESSER_EQUAL, temp, null, line));
                             char_counter += 2;
                         }
                         else
                         {
-                            tokens.Add(new Token(TokenType.LESSER, a.ToString(), null, line));
+                            tokens.Add(new Tokens(TokenType.LESSER, a.ToString(), null, line));
                             char_counter++;
                         }
                         break;
@@ -106,12 +106,12 @@ namespace Interpreter
                         if (NextChar() == '=')
                         {
                             string temp = "" + a + NextChar();
-                            tokens.Add(new Token(TokenType.EQUAL, temp, null, line));
+                            tokens.Add(new Tokens(TokenType.EQUAL, temp, null, line));
                             char_counter += 2;
                         }
                         else
                         {
-                            tokens.Add(new Token(TokenType.EQUALS, a.ToString(), null, line));
+                            tokens.Add(new Tokens(TokenType.EQUALS, a.ToString(), null, line));
                             char_counter++;
                         }
                         break;
@@ -119,15 +119,24 @@ namespace Interpreter
                         char_counter++;
                         break;
                     case ',':
-                        tokens.Add(new Token(TokenType.COMMA, a.ToString(), null, line));
+                        tokens.Add(new Tokens(TokenType.COMMA, a.ToString(), null, line));
                         char_counter++;
                         break;
                     case ':':
-                        tokens.Add(new Token(TokenType.COLON, a.ToString(), null, line));
+                        tokens.Add(new Tokens(TokenType.COLON, a.ToString(), null, line));
                         char_counter++;
                         break;
                     case '%':
-                        tokens.Add(new Token(TokenType.MOD, a.ToString(), null, line));
+                        tokens.Add(new Tokens(TokenType.MOD, a.ToString(), null, line));
+                        char_counter++;
+                        break;
+                    case ';':
+                        if (char_counter != charArrLength)
+                        {
+                            //error statement here
+                            char_counter++;
+                            break;
+                        }
                         char_counter++;
                         break;
                     default:
@@ -168,12 +177,12 @@ namespace Interpreter
                     a = NextChar();
                     char_counter++;
                 }
-                
+
             }
-            if(t==TokenType.INT_LIT)
-                tokens.Add(new Token(t, temp, Convert.ToInt32(temp), line));
+            if (t == TokenType.INT_LIT)
+                tokens.Add(new Tokens(t, temp, Convert.ToInt32(temp), line));
             else
-                tokens.Add(new Token(t, temp, Convert.ToDouble(temp), line));
+                tokens.Add(new Tokens(t, temp, Convert.ToDouble(temp), line));
 
         }
 
@@ -188,23 +197,30 @@ namespace Interpreter
             }
             switch (temp)
             {
-                case "START": tokens.Add(new Token(TokenType.START, temp, null, line));
+                case "START":
+                    tokens.Add(new Tokens(TokenType.START, temp, null, line));
                     break;
-                case "STOP":  tokens.Add(new Token(TokenType.STOP, temp, null, line));
+                case "STOP":
+                    tokens.Add(new Tokens(TokenType.STOP, temp, null, line));
                     break;
-                case "INT": tokens.Add(new Token(TokenType.INT, temp, null, line));
+                case "INT":
+                    tokens.Add(new Tokens(TokenType.INT, temp, null, line));
                     break;
-                case "FLOAT": tokens.Add(new Token(TokenType.FLOAT, temp, null, line));
+                case "FLOAT":
+                    tokens.Add(new Tokens(TokenType.FLOAT, temp, null, line));
                     break;
-                case "VAR": tokens.Add(new Token(TokenType.VAR, temp, null, line));
+                case "VAR":
+                    tokens.Add(new Tokens(TokenType.VAR, temp, null, line));
                     break;
-                case "AS": tokens.Add(new Token(TokenType.AS, temp, null, line));
+                case "AS":
+                    tokens.Add(new Tokens(TokenType.AS, temp, null, line));
                     break;
-                case "CHAR": tokens.Add(new Token(TokenType.CHAR, temp, null, line));
+                case "CHAR":
+                    tokens.Add(new Tokens(TokenType.CHAR, temp, null, line));
                     break;
                 default:
-                        tokens.Add(new Token(TokenType.IDENTIFIER, temp, null, line));
-                        break;
+                    tokens.Add(new Tokens(TokenType.IDENTIFIER, temp, null, line));
+                    break;
             }
         }
 
@@ -215,7 +231,7 @@ namespace Interpreter
 
         private bool isAlpha(char a)
         {
-            return (a >= 'a' && a <= 'z') || (a >= 'A' && a <= 'Z') || a=='_';
+            return (a >= 'a' && a <= 'z') || (a >= 'A' && a <= 'Z') || a == '_';
         }
 
         //Used only to check if the string has been properly split
@@ -224,10 +240,10 @@ namespace Interpreter
             get
             {
                 return source;
-            }    
+            }
         }
         //Used only to check if token list data are correct
-        public List<Token> Tokens
+        public List<Tokens> Tokens
         {
             get
             {

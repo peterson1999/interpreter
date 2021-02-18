@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Interpreter
+namespace CFPL_Interpreter
 {
     public enum TokenType
-    {
+{
         LEFT_PAREN, RIGHT_PAREN, //( )
         LEFT_BRACE, RIGHT_BRACE, //[]   
 
@@ -28,8 +28,8 @@ namespace Interpreter
         FLOAT_LIT,  //^([+-]?([0-9]*[.])?[0-9]+) 
         BOOL_LIT,  //^(TRUE|FALSE)
 
-            //RESERVED WORDS
+        //RESERVED WORDS
         VAR, AS, OUTPUT, IF, ELSE, WHILE, START, STOP, INT, BOOL, FLOAT, CHAR, EOF,
-        AND, OR, NOT
+        AND, OR, NOT, INPUT
     }
 }
