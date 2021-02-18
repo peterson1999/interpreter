@@ -14,6 +14,7 @@ namespace CFPL_Interpreter
         private static int charArrLength;
         private static int char_counter;
         private static int line;
+        private static List<string> errorMsg;
 
         public Scanner(string source)
         {
@@ -22,8 +23,9 @@ namespace CFPL_Interpreter
             line = 0;
             char_counter = 0;
             currString = "";
+            errorMsg = new List<string>();
         }
-        public void Process()
+        public int Process()
         {
             int i = 0;
             while (i < source.Length)
@@ -33,6 +35,12 @@ namespace CFPL_Interpreter
                 line++;
                 char_counter = 0;
             }
+            if (errorMsg.Count != 0)
+            {
+                return 1;
+            }
+            else
+                return 0;
         }
 
         public char NextChar()
@@ -50,7 +58,6 @@ namespace CFPL_Interpreter
             while (char_counter < charArrLength)
             {
                 char a = currString[char_counter];
-                Console.WriteLine(a);
                 switch (a)
                 {
                     case '+':
@@ -151,7 +158,12 @@ namespace CFPL_Interpreter
                             isIdentifier(a);
                             break;
                         }
-                        break;
+                        else
+                        {
+                            errorMsg.Add(string.Format("Encountered unsupported character \'{0}\' at line {1}.\n", a, line));
+                            char_counter++;
+                            break;
+                        }
                 }
             }
         }
@@ -218,6 +230,8 @@ namespace CFPL_Interpreter
                 case "CHAR":
                     tokens.Add(new Tokens(TokenType.CHAR, temp, null, line));
                     break;
+                case "INPUT": tokens.Add(new Tokens(TokenType.INPUT, temp, null, line));
+                    break;
                 default:
                     tokens.Add(new Tokens(TokenType.IDENTIFIER, temp, null, line));
                     break;
@@ -242,12 +256,18 @@ namespace CFPL_Interpreter
                 return source;
             }
         }
-        //Used only to check if token list data are correct
         public List<Tokens> Tokens
         {
             get
             {
                 return tokens;
+            }
+        }
+        public List<string> ErrorMsg
+        {
+            get
+            {
+                return errorMsg;
             }
         }
     }
