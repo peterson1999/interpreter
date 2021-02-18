@@ -14,6 +14,7 @@ namespace Interpreter
         private static int charArrLength;
         private static int char_counter;
         private static int line;
+        private static List<string> errorMsg;
 
         public Scanner(string source)
         {
@@ -22,8 +23,9 @@ namespace Interpreter
             line = 0;
             char_counter = 0;
             currString = "";
+            errorMsg = new List<string>();
         }
-        public void Process()
+        public int Process()
         {
             int i = 0;
             while (i < source.Length)
@@ -33,6 +35,12 @@ namespace Interpreter
                 line++;
                 char_counter = 0;
             }
+            if (errorMsg.Count != 0)
+            {
+                return 1;
+            }
+            else
+                return 0;
         }
 
         public char NextChar()
@@ -50,7 +58,6 @@ namespace Interpreter
             while (char_counter < charArrLength)
             {
                 char a = currString[char_counter];
-                Console.WriteLine(a);
                 switch (a)
                 {
                     case '+':
@@ -142,7 +149,12 @@ namespace Interpreter
                             isIdentifier(a);
                             break;
                         }
-                        break;
+                        else
+                        {
+                            errorMsg.Add(string.Format("Encountered unsupported character \'{0}\' at line {1}.\n", a, line));
+                            char_counter++;
+                            break;
+                        }
                 }
             }
         }
@@ -173,7 +185,7 @@ namespace Interpreter
             if(t==TokenType.INT_LIT)
                 tokens.Add(new Token(t, temp, Convert.ToInt32(temp), line));
             else
-                tokens.Add(new Token(t, temp, Convert.ToDouble(temp), line));
+                tokens.Add(new Token(t, temp, Convert.ToSingle(temp), line));
 
         }
 
@@ -202,6 +214,8 @@ namespace Interpreter
                     break;
                 case "CHAR": tokens.Add(new Token(TokenType.CHAR, temp, null, line));
                     break;
+                case "INPUT": tokens.Add(new Token(TokenType.INPUT, temp, null, line));
+                    break;
                 default:
                         tokens.Add(new Token(TokenType.IDENTIFIER, temp, null, line));
                         break;
@@ -226,12 +240,18 @@ namespace Interpreter
                 return source;
             }    
         }
-        //Used only to check if token list data are correct
         public List<Token> Tokens
         {
             get
             {
                 return tokens;
+            }
+        }
+        public List<string> ErrorMsg
+        {
+            get
+            {
+                return errorMsg;
             }
         }
     }
