@@ -207,10 +207,16 @@ namespace CFPL_Interpreter
                     tokens.Add(new Tokens(TokenType.STOP, temp, null, line));
                     break;
                 case "INT":
-                    tokens.Add(new Tokens(TokenType.INT, temp, null, line));
+                    if (tokens[tokens.Count - 1].Type == TokenType.AS)
+                        tokens.Add(new Tokens(TokenType.INT, temp, null, line));
+                    else
+                        errorMsg.Add("Invliad usage of a reserved word INT.");
                     break;
                 case "FLOAT":
-                    tokens.Add(new Tokens(TokenType.FLOAT, temp, null, line));
+                    if(tokens[tokens.Count-1].Type==TokenType.AS)
+                        tokens.Add(new Tokens(TokenType.FLOAT, temp, null, line));
+                    else
+                        errorMsg.Add("Invliad usage of a reserved word FLOAT.");
                     break;
                 case "VAR":
                     tokens.Add(new Tokens(TokenType.VAR, temp, null, line));
@@ -219,7 +225,10 @@ namespace CFPL_Interpreter
                     tokens.Add(new Tokens(TokenType.AS, temp, null, line));
                     break;
                 case "CHAR":
-                    tokens.Add(new Tokens(TokenType.CHAR, temp, null, line));
+                    if (tokens[tokens.Count - 1].Type == TokenType.AS)
+                        tokens.Add(new Tokens(TokenType.CHAR, temp, null, line));
+                    else
+                        errorMsg.Add("Invliad usage of a reserved word FLOAT.");
                     break;
                 case "INPUT": tokens.Add(new Tokens(TokenType.INPUT, temp, null, line));
                     break;

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Threading;
+using System.Runtime.InteropServices;
 
 namespace CFPL_Interpreter
 {
@@ -17,12 +18,16 @@ namespace CFPL_Interpreter
         private Dictionary<string, object> map;
         private static int error;
 
+        [DllImport("kernel32.dll")]
+        private static extern bool AllocConsole();
+
         public Interpreter(List<Tokens> t)
         {
             tokens = new List<Tokens>(t);
             map = new Dictionary<string, object>();
             tCounter = error  =0;
             hasStart = hasStop = false;
+            AllocConsole();
         }
         public int Parse()
         {
@@ -119,7 +124,6 @@ namespace CFPL_Interpreter
                             else
                             {
                                 error = 21; //Identifier does not exist;
-                                Console.WriteLine("indentifier does not exist");
                                 //error statement
                                 //identifier does not exist meaning variable not initialized
                             }
@@ -127,7 +131,7 @@ namespace CFPL_Interpreter
                         }
                         else
                         {
-                            //next token is not = meaning unused identifier
+                            error = -2;//next token is not = meaning unused identifier
                         }
                         //error statement (token is not =, INT_LIT, nor FLOAT_LIT)
                         break;
@@ -143,17 +147,51 @@ namespace CFPL_Interpreter
                         tCounter++;
                         if (tokens[tCounter].Type == TokenType.COLON)
                         {
+                            int notIden=1;
                             tCounter++;
-                            temp_identifier = tokens[tCounter].Lexeme;
-                            if (map.ContainsKey(temp_identifier))
+                            while (tokens[tCounter].Type == TokenType.IDENTIFIER)
                             {
-                                string s = Console.ReadLine();
-                                Console.WriteLine(s);
-                                //add here scanf method pls HAHA
+                                notIden = 0;
+                                temp_identifier = tokens[tCounter].Lexeme;
+                                if (map.ContainsKey(temp_identifier))
+                                {
+                                    string s = Console.ReadLine();
+                                    Type t = map[temp_identifier].GetType();
+                                    if (t == typeof(Int32))
+                                    {
+                                        temp = Convert.ToInt32(s);
+                                        map[temp_identifier] = temp;
+                                    }
+                                    else if (t == typeof(float))
+                                    {
+                                        temp = Convert.ToSingle(s);
+                                        map[temp_identifier] = temp;
+                                    }
+                                }
+                                else
+                                {
+                                    error = -6; //Variable not initialized
+                                    break;
+                                }
+                                tCounter++;
+                                if (tokens[tCounter].Type == TokenType.COMMA)
+                                {
+                                    tCounter++;
+                                    continue;
+                                }
+                                else if(tokens[tCounter].Type==TokenType.IDENTIFIER)
+                                {
+                                    error = -8; //Syntax error put comma after a variable to have more than 1 INPUTS
+                                    break;
+                                }
+                                else
+                                {
+                                    break;
+                                }
                             }
-                            else
+                            if (notIden == 1)
                             {
-                                error = -6; //Variable not initialized
+                                error = -7;
                             }
                         }
                         break;
@@ -161,6 +199,7 @@ namespace CFPL_Interpreter
                         break;
                 }
                 temp_identifier = "";
+                temp = null;
                 if (error != 0) break;
             }
             if (error != 0)
