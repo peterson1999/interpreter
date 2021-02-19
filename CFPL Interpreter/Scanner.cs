@@ -19,7 +19,7 @@ namespace CFPL_Interpreter
         public Scanner(string source)
         {
             tokens = new List<Tokens>();
-            this.source = source.Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            this.source = source.Split(new char[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
             line = 0;
             char_counter = 0;
             currString = "";
@@ -137,15 +137,6 @@ namespace CFPL_Interpreter
                         tokens.Add(new Tokens(TokenType.MOD, a.ToString(), null, line));
                         char_counter++;
                         break;
-                    case ';':
-                        if (char_counter != charArrLength)
-                        {
-                            //error statement here
-                            char_counter++;
-                            break;
-                        }
-                        char_counter++;
-                        break;
                     default:
                         if (isDigit(a))
                         {
@@ -160,7 +151,7 @@ namespace CFPL_Interpreter
                         }
                         else
                         {
-                            errorMsg.Add(string.Format("Encountered unsupported character \'{0}\' at line {1}.\n", a, line));
+                            errorMsg.Add(string.Format("Encountered unsupported character \"{0}\" at line {1}.\n", a, line+1));
                             char_counter++;
                             break;
                         }

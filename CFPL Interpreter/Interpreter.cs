@@ -3,31 +3,33 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
+using System.Threading;
 
-namespace Interpreter
+namespace CFPL_Interpreter
 {
     class Interpreter
     {
-        private List<Token> tokens;
+        private List<Tokens> tokens;
         private static bool hasStop;
         private static bool hasStart;
         private static int tCounter;
-        private static bool varAfterStart;
         private Dictionary<string, object> map;
+        private static int error;
 
-        public Interpreter(List<Token> t)
+        public Interpreter(List<Tokens> t)
         {
-            tokens = new List<Token>(t);
+            tokens = new List<Tokens>(t);
             map = new Dictionary<string, object>();
-            tCounter = 0;
-            hasStart = hasStop = varAfterStart=  false;
+            tCounter = error  =0;
+            hasStart = hasStop = false;
         }
         public int Parse()
         {
             List<string> varList = new List<string>();
             object temp;
-            Console.WriteLine(tokens.Count);
-           while(tCounter < tokens.Count && !varAfterStart)
+            string temp_identifier = "";
+           while(tCounter < tokens.Count)
             {
                 switch (tokens[tCounter].Type)
                 {
@@ -35,22 +37,30 @@ namespace Interpreter
                         if (!hasStart)
                         {
                             tCounter++;
-                            while (tokens[tCounter].Type == TokenType.IDENTIFIER || tokens[tCounter].Type == TokenType.COMMA)
+                            if (tokens[tCounter].Type == TokenType.IDENTIFIER)
                             {
+                                varList.Add(tokens[tCounter].Lexeme);
+                                tCounter++;
+                                while (tokens[tCounter].Type == TokenType.COMMA)
+                                {
+                                    tCounter++;
+                                    if (tokens[tCounter].Type == TokenType.IDENTIFIER)
+                                    {
+                                        varList.Add(tokens[tCounter].Lexeme);
+                                        tCounter++;
+                                    }
+                                }
                                 if (tokens[tCounter].Type == TokenType.IDENTIFIER)
-                                {
-                                    varList.Add(tokens[tCounter].Lexeme);
-                                    tCounter++;
-                                }
-                                else if (tokens[tCounter].Type == TokenType.COMMA)
-                                {
-                                    tCounter++;
-                                }
-                                else
-                                {
-                                    break;
-                                }
+                                    error = -2; //Invalid variable declaration e.g VAR a b 
                             }
+                            else
+                            {
+                                error = -3; //Invalid variable declaration token after VAR is not an Identifier.
+                            }
+                        }
+                        else
+                        {
+                            error = -4; //variable declaration after start
                         }
                         break;
                     case TokenType.INT_LIT:
@@ -89,7 +99,7 @@ namespace Interpreter
                         }
                         break;
                     case TokenType.IDENTIFIER:
-                        string temp_identifier = tokens[tCounter++].Lexeme;
+                        temp_identifier = tokens[tCounter++].Lexeme;
                         if (tokens[tCounter].Type == TokenType.EQUALS)
                         {
                             tCounter++;
@@ -105,16 +115,13 @@ namespace Interpreter
                                     temp = (float)tokens[tCounter].Literal;
                                     map[temp_identifier] = temp;
                                 }
-                                else
-                                {
-                                    //error statement
-                                }
                             }
                             else
                             {
+                                error = 21; //Identifier does not exist;
                                 Console.WriteLine("indentifier does not exist");
                                 //error statement
-                                //identifier does not exist in hashmap
+                                //identifier does not exist meaning variable not initialized
                             }
                             
                         }
@@ -133,19 +140,40 @@ namespace Interpreter
                         tCounter++;
                         break;
                     case TokenType.INPUT:
-
+                        tCounter++;
+                        if (tokens[tCounter].Type == TokenType.COLON)
+                        {
+                            tCounter++;
+                            temp_identifier = tokens[tCounter].Lexeme;
+                            if (map.ContainsKey(temp_identifier))
+                            {
+                                string s = Console.ReadLine();
+                                Console.WriteLine(s);
+                                //add here scanf method pls HAHA
+                            }
+                            else
+                            {
+                                error = -6; //Variable not initialized
+                            }
+                        }
                         break;
                     default:
                         break;
                 }
+                temp_identifier = "";
+                if (error != 0) break;
             }
-            if (hasStart == true && hasStop == true && varAfterStart ==false)
+            if (error != 0)
+            {
+                return error;
+            }
+            else if (hasStart == true && hasStop == true)
             {
                 return 0;
             }
             else if (hasStart == false)
             {
-                return 13; //just error handling
+                return 13;
             }
             else if (hasStart == true && hasStop == false)
             {
@@ -155,20 +183,8 @@ namespace Interpreter
             {
                 return -13;
             }
-            else if (varAfterStart == true)
-            {
-                return -5;
-            }
             else
-                return 1;
-        }
-        public void NextToken()
-        {
-            tCounter++;
-        }
-        public void Error()
-        {
-
+                return 0; //no problem
         }
         public Dictionary<string, object> Map
         {
