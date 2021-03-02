@@ -171,9 +171,10 @@ namespace CFPL_Interpreter
             }
             if (a == '.')
             {
-                char_counter++;
+                temp += a;
                 t = TokenType.FLOAT_LIT;
                 a = NextChar();
+                char_counter++;
                 while (isDigit(a))
                 {
                     temp += a;
@@ -210,13 +211,13 @@ namespace CFPL_Interpreter
                     if (tokens[tokens.Count - 1].Type == TokenType.AS)
                         tokens.Add(new Tokens(TokenType.INT, temp, null, line));
                     else
-                        errorMsg.Add("Invliad usage of a reserved word INT.");
+                        errorMsg.Add(string.Format("Invalid usage of a reserved word INT at line {0}.", line));
                     break;
                 case "FLOAT":
                     if(tokens[tokens.Count-1].Type==TokenType.AS)
                         tokens.Add(new Tokens(TokenType.FLOAT, temp, null, line));
                     else
-                        errorMsg.Add("Invliad usage of a reserved word FLOAT.");
+                        errorMsg.Add(string.Format("Invalid usage of a reserved word FLOAT at line {0}.", line));
                     break;
                 case "VAR":
                     tokens.Add(new Tokens(TokenType.VAR, temp, null, line));
@@ -228,7 +229,7 @@ namespace CFPL_Interpreter
                     if (tokens[tokens.Count - 1].Type == TokenType.AS)
                         tokens.Add(new Tokens(TokenType.CHAR, temp, null, line));
                     else
-                        errorMsg.Add("Invliad usage of a reserved word FLOAT.");
+                        errorMsg.Add(string.Format("Invalid usage of a reserved word CHAR at line {0}.", line));
                     break;
                 case "INPUT": tokens.Add(new Tokens(TokenType.INPUT, temp, null, line));
                     break;

@@ -17,6 +17,7 @@ namespace CFPL_Interpreter
         private static int tCounter;
         private Dictionary<string, object> map;
         private static int error;
+        private static List<string> errorMsg;
 
         [DllImport("kernel32.dll")]
         private static extern bool AllocConsole();
@@ -24,6 +25,7 @@ namespace CFPL_Interpreter
         public Interpreter(List<Tokens> t)
         {
             tokens = new List<Tokens>(t);
+            errorMsg = new List<string>();
             map = new Dictionary<string, object>();
             tCounter = error  =0;
             hasStart = hasStop = false;
@@ -54,18 +56,29 @@ namespace CFPL_Interpreter
                                         varList.Add(tokens[tCounter].Lexeme);
                                         tCounter++;
                                     }
+                                    else
+                                    {
+                                        errorMsg.Add(string.Format("Syntax Error. Excess comma at line {0}.", tokens[tCounter].Line));
+                                        //error = -35; //COMMA but next token is not an Identifier
+                                    }
                                 }
                                 if (tokens[tCounter].Type == TokenType.IDENTIFIER)
-                                    error = -2; //Invalid variable declaration e.g VAR a b 
+                                {
+                                    errorMsg.Add(string.Format("Invalid variable declaration at line {0}.", tokens[tCounter].Line));
+                                    //error = -2; //Invalid variable declaration e.g VAR a b 
+                                }
+                                
                             }
                             else
                             {
-                                error = -3; //Invalid variable declaration token after VAR is not an Identifier.
+                                errorMsg.Add(string.Format("Invalid variable declaration. Token after VAR is not an Identifier at line {0}.", tokens[tCounter].Line));
+                                //error = -3; //Invalid variable declaration token after VAR is not an Identifier.
                             }
                         }
                         else
                         {
-                            error = -4; //variable declaration after start
+                            errorMsg.Add(string.Format("Invalid variable declaration. Declaration after START at line {0}.", tokens[tCounter].Line));
+                            //error = -4; //variable declaration after start
                         }
                         break;
                     case TokenType.INT_LIT:
@@ -73,7 +86,7 @@ namespace CFPL_Interpreter
                         tCounter++;
                         break;
                     case TokenType.FLOAT_LIT:
-                        temp = (float)tokens[tCounter].Literal;
+                        temp = (double)tokens[tCounter].Literal;
                         tCounter++;
                         break;
                     case TokenType.AS:
@@ -82,7 +95,7 @@ namespace CFPL_Interpreter
                         {
                             foreach(string a in varList)
                             {
-                                map.Add(a, 0);
+                                map.Add(a, (int)0);
                             }
                             tCounter++;
                             varList.Clear();  //varList is a list of variable declaration in one line of code;
@@ -92,7 +105,7 @@ namespace CFPL_Interpreter
                         {
                             foreach (var a in varList)
                             {
-                                map.Add(a, 0.0);
+                                map.Add(a, (double)0.0);
                             }
                             tCounter++;
                             varList.Clear();  //varList is a list of variable declaration in one line of code;
@@ -117,13 +130,14 @@ namespace CFPL_Interpreter
                                 }
                                 else if (tokens[tCounter].Type == TokenType.FLOAT_LIT)
                                 {
-                                    temp = (float)tokens[tCounter].Literal;
+                                    temp = (double)tokens[tCounter].Literal;
                                     map[temp_identifier] = temp;
                                 }
                             }
                             else
                             {
-                                error = 21; //Identifier does not exist;
+                                errorMsg.Add(string.Format("Identifier does not exist at line {0}.", tokens[tCounter].Line));
+                                //error = 21; //Identifier does not exist;
                                 //error statement
                                 //identifier does not exist meaning variable not initialized
                             }
@@ -131,16 +145,29 @@ namespace CFPL_Interpreter
                         }
                         else
                         {
-                            error = -2;//next token is not = meaning unused identifier
+                            errorMsg.Add(string.Format("Syntax error. Are you trying to do a variable assignation at line {0}?", tokens[tCounter].Line));
+                            //error = -2;//next token is not = meaning unused identifier
                         }
                         //error statement (token is not =, INT_LIT, nor FLOAT_LIT)
                         break;
                     case TokenType.START:
-                        hasStart = true;
+                        if(hasStart)
+                        {
+                            errorMsg.Add(string.Format("Syntax error. Incorrect usage of START at line {0}", tokens[tCounter].Line));
+                            //error = -10;
+                        }
+                        else
+                            hasStart = true;
                         tCounter++;
                         break;
                     case TokenType.STOP:
-                        hasStop = true;
+                        if (hasStop)
+                        {
+                            errorMsg.Add(string.Format("Syntax error. Incorrect usage of STOP at line {0}", tokens[tCounter].Line));
+                            //error = -10;
+                        }
+                        else
+                            hasStop = true;
                         tCounter++;
                         break;
                     case TokenType.INPUT:
@@ -157,20 +184,22 @@ namespace CFPL_Interpreter
                                 {
                                     string s = Console.ReadLine();
                                     Type t = map[temp_identifier].GetType();
+                                    Console.WriteLine(t.ToString());
                                     if (t == typeof(Int32))
                                     {
                                         temp = Convert.ToInt32(s);
                                         map[temp_identifier] = temp;
                                     }
-                                    else if (t == typeof(float))
+                                    else if (t == typeof(double))
                                     {
-                                        temp = Convert.ToSingle(s);
+                                        temp = Convert.ToDouble(s);
                                         map[temp_identifier] = temp;
                                     }
                                 }
                                 else
                                 {
-                                    error = -6; //Variable not initialized
+                                    errorMsg.Add(string.Format("Variable not initialized at line {0}.", tokens[tCounter].Line));
+                                    //error = -6; //Variable not initialized
                                     break;
                                 }
                                 tCounter++;
@@ -181,7 +210,8 @@ namespace CFPL_Interpreter
                                 }
                                 else if(tokens[tCounter].Type==TokenType.IDENTIFIER)
                                 {
-                                    error = -8; //Syntax error put comma after a variable to have more than 1 INPUTS
+                                    errorMsg.Add(string.Format("Syntax error. Multiple inputs need a comma in between at line {0}.", tokens[tCounter].Line));
+                                    //error = -8; //Syntax error put comma after a variable to have more than 1 INPUTS
                                     break;
                                 }
                                 else
@@ -191,7 +221,8 @@ namespace CFPL_Interpreter
                             }
                             if (notIden == 1)
                             {
-                                error = -7;
+                                errorMsg.Add(string.Format("Token after INPUT is not a variable name. Error at line {0}.", tokens[tCounter].Line));
+                                //error = -7;
                             }
                         }
                         break;
@@ -200,9 +231,8 @@ namespace CFPL_Interpreter
                 }
                 temp_identifier = "";
                 temp = null;
-                if (error != 0) break;
             }
-            if (error != 0)
+            /*if (error != 0)
             {
                 return error;
             }
@@ -223,13 +253,21 @@ namespace CFPL_Interpreter
                 return -13;
             }
             else
-                return 0; //no problem
+                return 0; //no problem*/
+            return errorMsg.Count;
         }
         public Dictionary<string, object> Map
         {
             get
             {
                 return map;
+            }
+        }
+        public List<string> ErrorMsg
+        {
+            get
+            {
+                return errorMsg;
             }
         }
     }
