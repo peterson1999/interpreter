@@ -13,6 +13,11 @@ namespace CFPL_Interpreter
     public partial class Form1 : Form
     {
         public int count = 0;
+        Scanner scanner;
+        Interpreter interpreter;
+        Dictionary<string, object> dict;
+        public int errorInterpreter;
+        public int errorScanner;
         public Form1()
         {
             InitializeComponent();
@@ -51,7 +56,7 @@ namespace CFPL_Interpreter
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
             SaveFileDialog svf = new SaveFileDialog();
-            svf.Filter= "Text Files (.txt)|*.txt";
+            svf.Filter = "Text Files (.txt)|*.txt";
             svf.Title = "Save File...";
             if (svf.ShowDialog() == DialogResult.OK)
             {
@@ -84,6 +89,101 @@ namespace CFPL_Interpreter
         private void pasteToolStripMenuItem_Click(object sender, EventArgs e)
         {
             fastColoredTextBox1.Paste();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            interpreter = new Interpreter(scanner.Tokens);
+            errorInterpreter = interpreter.Parse();
+            dict = interpreter.Map;
+            InterErrorHandler();
+            foreach (KeyValuePair<string, object> a in dict)
+            {
+                Console.WriteLine(string.Format("var name:{0}, var value: {1}", a.Key, a.Value));
+            }
+        }
+
+        private void InterErrorHandler()
+        {
+            if (errorInterpreter == 0)
+            {
+                richTextBox2.Text += "Parsing Complete..\n";
+            }
+            else if (errorInterpreter == 13)
+            {
+                richTextBox2.Text += "Program can't be executed. Has no START.\n";
+            }
+            else if (errorInterpreter == 14)
+            {
+                richTextBox2.Text += "Program can't be executed. Has no STOP.\n";
+            }
+            else if (errorInterpreter == -13)
+                richTextBox2.Text += "Program can't be executed. Has no START nor STOP.\n";
+            else if (errorInterpreter == -4)
+            {
+                richTextBox2.Text += "Parsing Error. Variable declaration after START.\n";
+            }
+            else if (errorInterpreter == -2)
+            {
+                richTextBox2.Text += "Invalid variable declaration\n";
+            }
+            else if (errorInterpreter == -3)
+            {
+                richTextBox2.Text += "Invalid variable declaration token after VAR is not an Identifier.\n";
+            }
+            else if (errorInterpreter == -6)
+            {
+                richTextBox2.Text += "Variable not initialized.\n";
+            }
+            else if (errorInterpreter == -10)
+            {
+                richTextBox2.Text += "Syntax error. Incorrect usage of START.\n";
+            }
+            else if (errorInterpreter == -11)
+            {
+                richTextBox2.Text += "Syntax error. Incorrect usage of STOP.\n";
+            }
+            else if (errorInterpreter == 51)
+            {
+                richTextBox2.Text += "Syntax error.\n";
+            }
+        }
+
+        private void richTextBox2_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void helpToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void fileToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button2_Click_1(object sender, EventArgs e)
+        {
+            scanner = new Scanner(fastColoredTextBox1.Text);
+            errorScanner = scanner.Process();
+
+            List<Tokens> t = new List<Tokens>(scanner.Tokens);
+            if (errorScanner == 0)
+                button2.Enabled = true;
+            else
+            {
+                foreach (string a in scanner.ErrorMsg)
+                {
+                    richTextBox2.Text += a + "\n";
+                }
+            }
         }
     }
 }

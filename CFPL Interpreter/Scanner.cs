@@ -137,6 +137,18 @@ namespace CFPL_Interpreter
                         tokens.Add(new Tokens(TokenType.MOD, a.ToString(), null, line));
                         char_counter++;
                         break;
+                    case '&':
+                        tokens.Add(new Tokens(TokenType.AMPERSAND, a.ToString(), null, line));
+                        char_counter++;
+                        break;
+                    case '"':
+                        tokens.Add(new Tokens(TokenType.D_QUOTE, a.ToString(), null, line));
+                        char_counter++;
+                        break;
+                    case '#':
+                        tokens.Add(new Tokens(TokenType.SHARP, a.ToString(), null, line));
+                        char_counter++;
+                        break;
                     default:
                         if (isDigit(a))
                         {
@@ -151,7 +163,7 @@ namespace CFPL_Interpreter
                         }
                         else
                         {
-                            errorMsg.Add(string.Format("Encountered unsupported character \"{0}\" at line {1}.\n", a, line+1));
+                            errorMsg.Add(string.Format("Encountered unsupported character \"{0}\" at line {1}.\n", a, line + 1));
                             char_counter++;
                             break;
                         }
@@ -214,7 +226,7 @@ namespace CFPL_Interpreter
                         errorMsg.Add(string.Format("Invalid usage of a reserved word INT at line {0}.", line));
                     break;
                 case "FLOAT":
-                    if(tokens[tokens.Count-1].Type==TokenType.AS)
+                    if (tokens[tokens.Count - 1].Type == TokenType.AS)
                         tokens.Add(new Tokens(TokenType.FLOAT, temp, null, line));
                     else
                         errorMsg.Add(string.Format("Invalid usage of a reserved word FLOAT at line {0}.", line));
@@ -231,7 +243,11 @@ namespace CFPL_Interpreter
                     else
                         errorMsg.Add(string.Format("Invalid usage of a reserved word CHAR at line {0}.", line));
                     break;
-                case "INPUT": tokens.Add(new Tokens(TokenType.INPUT, temp, null, line));
+                case "INPUT":
+                    tokens.Add(new Tokens(TokenType.INPUT, temp, null, line));
+                    break;
+                case "OUTPUT":
+                    tokens.Add(new Tokens(TokenType.OUTPUT, temp, null, line));
                     break;
                 default:
                     tokens.Add(new Tokens(TokenType.IDENTIFIER, temp, null, line));

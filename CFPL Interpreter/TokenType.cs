@@ -7,14 +7,14 @@ using System.Threading.Tasks;
 namespace CFPL_Interpreter
 {
     public enum TokenType
-{
+    {
         //Valid character tokens
         LEFT_PAREN, RIGHT_PAREN, //( )
         LEFT_BRACE, RIGHT_BRACE, //[]  
         COMMA, EQUALS, COLON,  // , =  :
 
         //Esacape character
-        SHARP, AMPERSAND, //# &
+        SHARP, AMPERSAND, D_QUOTE,//# & "
 
         //Operation
         MULT, ADD, SUBT, DIV, MOD, //* + - / %
@@ -33,8 +33,8 @@ namespace CFPL_Interpreter
         BOOL_LIT,  //^(TRUE|FALSE)
 
         //RESERVED WORDS
-        VAR, AS, OUTPUT, IF, ELSE, 
-        WHILE, START, STOP, INT, 
+        VAR, AS, OUTPUT, IF, ELSE,
+        WHILE, START, STOP, INT,
         BOOL, FLOAT, CHAR,
         AND, OR, NOT, INPUT
     }
