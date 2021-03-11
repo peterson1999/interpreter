@@ -37,6 +37,7 @@ namespace CFPL_Interpreter
             }
             if (errorMsg.Count != 0)
             {
+                
                 return 1;
             }
             else
@@ -147,6 +148,14 @@ namespace CFPL_Interpreter
                         break;
                     case '#':
                         tokens.Add(new Tokens(TokenType.SHARP, a.ToString(), null, line));
+                        char_counter++;
+                        break;
+                    case '[':
+                        tokens.Add(new Tokens(TokenType.LEFT_BRACE, a.ToString(), null, line));
+                        char_counter++;
+                        break;
+                    case ']':
+                        tokens.Add(new Tokens(TokenType.RIGHT_BRACE, a.ToString(), null, line));
                         char_counter++;
                         break;
                     default:

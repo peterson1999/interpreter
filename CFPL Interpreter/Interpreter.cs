@@ -422,11 +422,55 @@ namespace CFPL_Interpreter
                                     {
                                         Console.WriteLine();
                                     }
+                                    else if(tokens[tCounter].Type == TokenType.LEFT_BRACE)
+                                    {
+                                        tCounter++;
+                                        if (tokens[tCounter].Type == TokenType.SHARP)
+                                        {
+                                            char sharp = '#';
+                                            //Console.WriteLine(tokens[tCounter].Lexeme);
+                                            tCounter++;
+                                            if(tokens[tCounter].Type == TokenType.RIGHT_BRACE)
+                                            {
+                                                tCounter++;
+                                                if(tokens[tCounter].Type == TokenType.D_QUOTE)
+                                                {
+                                                    Console.WriteLine(sharp);
+                                                    tCounter++;
+                                                    break;
+                                                }
+                                                else
+                                                {
+                                                   
+                                                    errorMsg.Add(string.Format("Missing Double Quote at Line {0}.", tokens[tCounter].Line));
+                                                    break;
+                                                }
+                                            }
+                                            else
+                                            {
+                                                errorMsg.Add(string.Format("Missing Closing Brace at Line {0}.", tokens[tCounter].Line));
+                                                break;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            errorMsg.Add(string.Format("Invalid Reserved Word at Line {0}.", tokens[tCounter].Line));
+                                            break;
+                                        }
+                                    }
                                     else
                                     {
                                         Console.Write(tokens[tCounter].Lexeme);//else print token
+                                        tCounter++;
                                     }
-                                    tCounter += 2;//skip close d_quote and move to next token
+                                    if (tokens[tCounter].Type == TokenType.D_QUOTE)
+                                    {
+                                        tCounter++;
+                                    }
+                                    else
+                                    {
+                                        errorMsg.Add(string.Format("Missing Double Quote at Line {0}.", tokens[tCounter].Line));
+                                    }
                                 }
                                 if (tokens[tCounter].Type == TokenType.AMPERSAND)
                                 {

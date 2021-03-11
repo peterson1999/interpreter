@@ -102,10 +102,22 @@ namespace CFPL_Interpreter
             errorInterpreter = interpreter.Parse();
             dict = interpreter.Map;
             InterErrorHandler();
-            foreach (KeyValuePair<string, object> a in dict)
+            if (errorInterpreter == 0)
             {
-                Console.WriteLine(string.Format("var name:{0}, var value: {1}", a.Key, a.Value));
+                foreach (KeyValuePair<string, object> a in dict)
+                {
+                    Console.WriteLine(string.Format("var name:{0}, var value: {1}", a.Key, a.Value));
+                }
             }
+               
+            else
+            {
+                foreach (string a in interpreter.ErrorMsg)
+                {
+                    richTextBox2.Text += a + "\n";
+                }
+            }
+            
         }
 
         private void InterErrorHandler()
