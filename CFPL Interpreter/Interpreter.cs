@@ -27,8 +27,13 @@ namespace CFPL_Interpreter
         public int Parse()
         {
             List<string> varList = new List<string>();
-            object temp;
+            object temp="";
+            int intTemp;
+            float floatTemp;
             string temp_identifier = "";
+            int unary = 0;
+            TokenType lasttemp;
+            Console.WriteLine(tokens.Count);
            while(tCounter < tokens.Count)
             {
                 switch (tokens[tCounter].Type)
@@ -64,11 +69,68 @@ namespace CFPL_Interpreter
                         }
                         break;
                     case TokenType.INT_LIT:
-                        temp = (int)tokens[tCounter].Literal;
+                        if (unary != 0)
+                        {
+                            
+                            temp = ((int)tokens[tCounter].Literal)*unary;
+                            Console.WriteLine(temp);
+                            unary = 0;
+                        }
+                        else
+                        {
+                            temp = ((int)tokens[tCounter].Literal);
+                        }
                         tCounter++;
                         break;
+                    case TokenType.ADD:
+                        //if prev token is int,float, or identifier, '+' is an arithemtic operator (left blank for now)
+                        if (tCounter>0 && (tokens[tCounter-1].Type == TokenType.IDENTIFIER || tokens[tCounter - 1].Type == TokenType.INT_LIT || tokens[tCounter - 1].Type == TokenType.FLOAT_LIT))
+                        {
+                            tCounter++;
+                            break;
+                        }
+                        
+                        else
+                        {
+                            //if next token is int,float, or identifier, '+' is a unary operator (activates flag)
+                            if (tokens[tCounter + 1].Type == TokenType.INT_LIT|| tokens[tCounter + 1].Type == TokenType.FLOAT_LIT || tokens[tCounter + 1].Type == TokenType.IDENTIFIER)
+                            {
+                                unary = 1;
+                            }
+                            tCounter++;
+                            break;
+                        }
+                    case TokenType.SUBT:
+                        //if prev token is int,float, or identifier, '+' is an arithemtic operator (left blank for now)
+                        if (tCounter > 0 && (tokens[tCounter - 1].Type == TokenType.IDENTIFIER || tokens[tCounter - 1].Type == TokenType.INT_LIT || tokens[tCounter - 1].Type == TokenType.FLOAT_LIT))
+                        {
+                            tCounter++;
+                            break;
+                        }
+
+                        else
+                        {
+                            
+                            //if next token is int,float, or identifier, '+' is a unary operator (activates flag)
+                            if (tokens[tCounter + 1].Type == TokenType.INT_LIT || tokens[tCounter + 1].Type == TokenType.FLOAT_LIT || tokens[tCounter + 1].Type == TokenType.IDENTIFIER)
+                            {
+                                
+                                unary = -1;
+                            }
+                            tCounter++;
+                            break;
+                        }
+
                     case TokenType.FLOAT_LIT:
-                        temp = (float)tokens[tCounter].Literal;
+                        if (unary != 0)
+                        {
+                            temp = ((float)tokens[tCounter].Literal) * unary;
+                            unary = 0;
+                        }
+                        else
+                        {
+                            temp = ((float)tokens[tCounter].Literal);
+                        }
                         tCounter++;
                         break;
                     case TokenType.AS:

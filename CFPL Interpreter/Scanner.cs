@@ -56,14 +56,15 @@ namespace CFPL_Interpreter
         {
             currString = source[line];
             charArrLength = currString.Length;
+  
             while (char_counter < charArrLength)
             {
                 char a = currString[char_counter];
                 switch (a)
                 {
                     case '+':
-                        tokens.Add(new Tokens(TokenType.ADD, a.ToString(), null, line));
-                        char_counter++;
+                            tokens.Add(new Tokens(TokenType.ADD, a.ToString(), null, line));
+                            char_counter++;
                         break;
                     case '-':
                         tokens.Add(new Tokens(TokenType.SUBT, a.ToString(), null, line));
@@ -157,6 +158,7 @@ namespace CFPL_Interpreter
                             break;
                         }
                 }
+            
             }
         }
 
