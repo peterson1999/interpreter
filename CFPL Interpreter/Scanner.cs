@@ -24,6 +24,7 @@ namespace CFPL_Interpreter
             char_counter = 0;
             currString = "";
             errorMsg = new List<string>();
+           
         }
         public int Process()
         {
