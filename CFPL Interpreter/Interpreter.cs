@@ -34,7 +34,7 @@ namespace CFPL_Interpreter
         public int Parse()
         {
             List<string> varList = new List<string>();
-            Dictionary<string, float> declared = new Dictionary<string, float>();
+            Dictionary<string, double> declared = new Dictionary<string, double>();
             object temp;
             string temp_identifier = "";
            while(tCounter < tokens.Count)
@@ -42,9 +42,11 @@ namespace CFPL_Interpreter
                 switch (tokens[tCounter].Type)
                 {
                     case TokenType.VAR:
+                        //Console.WriteLine("Dsadas");
                         if (!hasStart)
                         {
-                           tCounter++;
+                            
+                            tCounter++;
                             if (tokens[tCounter].Type == TokenType.IDENTIFIER)
                             {
                                 varList.Add(tokens[tCounter].Lexeme);
@@ -66,7 +68,7 @@ namespace CFPL_Interpreter
                                     }
                                         else if (tokens[tCounter].Type == TokenType.FLOAT_LIT)
                                         {
-                                        declared.Add(temp_identifier, (float)tokens[tCounter].Literal);
+                                        declared.Add(temp_identifier, (double)tokens[tCounter].Literal);
                                         tCounter++;
 
                                         //map[temp_identifier] = temp;
@@ -83,7 +85,7 @@ namespace CFPL_Interpreter
                                         }
                                             else if (tokens[tCounter].Type == TokenType.FLOAT_LIT)
                                             {
-                                            declared.Add(temp_identifier, ((float)tokens[tCounter].Literal) * 1);
+                                            declared.Add(temp_identifier, ((double)(tokens[tCounter].Literal)) * 1);
                                             tCounter++;
                                             // map[temp_identifier] = temp;
                                         }
@@ -99,7 +101,8 @@ namespace CFPL_Interpreter
                                         }
                                             else if (tokens[tCounter].Type == TokenType.FLOAT_LIT)
                                             {
-                                            declared.Add(temp_identifier, ((float)tokens[tCounter].Literal) * -1);
+                                            
+                                            declared.Add(temp_identifier, ((double)(tokens[tCounter].Literal))*-1);
                                             tCounter++;
                                             //map[temp_identifier] = temp;
                                         }
@@ -115,12 +118,13 @@ namespace CFPL_Interpreter
                                     {
                                         varList.Add(tokens[tCounter].Lexeme);
                                         tCounter++;
+                                        //Console.WriteLine(tokens[tCounter].Lexeme);
                                         if (tokens[tCounter].Type == TokenType.EQUALS)
                                         {
 
                                             temp_identifier = tokens[tCounter - 1].Lexeme;
                                             tCounter++;
-
+                                            
                                             if (tokens[tCounter].Type == TokenType.INT_LIT)
                                             {
 
@@ -131,7 +135,7 @@ namespace CFPL_Interpreter
                                             }
                                             else if (tokens[tCounter].Type == TokenType.FLOAT_LIT)
                                             {
-                                                declared.Add(temp_identifier, (float)tokens[tCounter].Literal);
+                                                declared.Add(temp_identifier, (double)tokens[tCounter].Literal);
                                                 tCounter++;
 
                                                 //map[temp_identifier] = temp;
@@ -148,7 +152,7 @@ namespace CFPL_Interpreter
                                                 }
                                                 else if (tokens[tCounter].Type == TokenType.FLOAT_LIT)
                                                 {
-                                                    declared.Add(temp_identifier, ((float)tokens[tCounter].Literal) * 1);
+                                                    declared.Add(temp_identifier, ((double)tokens[tCounter].Literal) * 1);
                                                     tCounter++;
                                                     // map[temp_identifier] = temp;
                                                 }
@@ -160,23 +164,25 @@ namespace CFPL_Interpreter
                                                 {
                                                     declared.Add(temp_identifier, ((int)tokens[tCounter].Literal) * -1);
                                                     tCounter++;
+                                                    
                                                     // map[temp_identifier] = temp;
                                                 }
                                                 else if (tokens[tCounter].Type == TokenType.FLOAT_LIT)
                                                 {
-                                                    declared.Add(temp_identifier, ((float)tokens[tCounter].Literal) * -1);
+                                                    declared.Add(temp_identifier, ((double)tokens[tCounter].Literal) * -1);
                                                     tCounter++;
                                                     //map[temp_identifier] = temp;
                                                 }
                                             }
                                     }
+                                    
+                                }
                                     else
                                     {
                                         errorMsg.Add(string.Format("Syntax Error. Excess comma at line {0}.", tokens[tCounter].Line));
                                         //error = -35; //COMMA but next token is not an Identifier
                                     }
-                                }
-                                if (tokens[tCounter].Type == TokenType.IDENTIFIER)
+                                    if (tokens[tCounter].Type == TokenType.IDENTIFIER)
                                 {
                                     errorMsg.Add(string.Format("Invalid variable declaration at line {0}.", tokens[tCounter].Line));
                                     //error = -2; //Invalid variable declaration e.g VAR a b 
@@ -213,7 +219,7 @@ namespace CFPL_Interpreter
 
                                 if (declared.ContainsKey(a))
                                 {
-                                    Console.WriteLine(a);
+                                    //Console.WriteLine(a);
                                     map.Add(a, (int)declared[a]);
 
                                 }
@@ -230,10 +236,12 @@ namespace CFPL_Interpreter
                         }
                         else if (tokens[tCounter].Type == TokenType.FLOAT)
                         {
+                            //Console.WriteLine("DASDsdfs");
                             foreach (var a in varList)
                             {
                                 if (declared.ContainsKey(a))
                                 {
+                                   // Console.WriteLine(declared[a]);
                                     map.Add(a, declared[a]);
                                 }
                                 else
@@ -266,7 +274,7 @@ namespace CFPL_Interpreter
                                 }
                                 else if (tokens[tCounter].Type == TokenType.FLOAT_LIT)
                                 {
-                                    temp = (float)tokens[tCounter].Literal;
+                                    temp = (double)tokens[tCounter].Literal;
                                     map[temp_identifier] = temp;
                                 }
                                 //unary add
@@ -280,7 +288,7 @@ namespace CFPL_Interpreter
                                     }
                                     else if (tokens[tCounter].Type == TokenType.FLOAT_LIT)
                                     {
-                                        temp = (float)tokens[tCounter].Literal*1;
+                                        temp = (double)tokens[tCounter].Literal*1;
                                         map[temp_identifier] = temp;
                                     }
                                 }
@@ -294,7 +302,7 @@ namespace CFPL_Interpreter
                                     }
                                     else if (tokens[tCounter].Type == TokenType.FLOAT_LIT)
                                     {
-                                        temp = (float)tokens[tCounter].Literal * -1;
+                                        temp = (double)tokens[tCounter].Literal * -1;
                                         map[temp_identifier] = temp;
                                     }
                                 }
@@ -399,6 +407,7 @@ namespace CFPL_Interpreter
                             tCounter++;
                             while (tokens[tCounter].Type == TokenType.IDENTIFIER || tokens[tCounter].Type == TokenType.D_QUOTE)
                             {
+                                //Console.WriteLine("Lexeme:"+tokens[tCounter].Lexeme);
                                 if (tokens[tCounter].Type == TokenType.IDENTIFIER)
                                 {
                                     notIden = 0;
@@ -421,6 +430,7 @@ namespace CFPL_Interpreter
                                     if (tokens[tCounter].Type == TokenType.SHARP)// if # print newline
                                     {
                                         Console.WriteLine();
+                                        tCounter++;
                                     }
                                     else if(tokens[tCounter].Type == TokenType.LEFT_BRACE)
                                     {
@@ -437,7 +447,7 @@ namespace CFPL_Interpreter
                                                 {
                                                     Console.WriteLine(sharp);
                                                     tCounter++;
-                                                    break;
+                                                    continue;
                                                 }
                                                 else
                                                 {
