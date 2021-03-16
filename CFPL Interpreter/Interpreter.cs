@@ -951,6 +951,136 @@ namespace CFPL_Interpreter
             if (x.Equals('>') || x.Equals('<') || x.Equals('g') || x.Equals('l') || x.Equals('e') || x.Equals('n') || x.Equals('a') || x.Equals('o') || x.Equals('!')) return true;
             else return false;
         }
+        public float evaluateBoolPostfix()
+        {
+            bool ans;
+            float num1 = 0, num2 = 0;
+            string temp = string.Join("", postfix);
+            string[] tokens = temp.Split(' ');
+            Stack<string> s2 = new Stack<string>();
+            string temp_ans;
+            bool x1 = false, x2 = false;
+
+            foreach (string token in tokens)
+            {
+                if (token.Length != 0 && (isOperator(token[0].ToString()) || isRel(token[0].ToString())))
+                {
+                    if (token[0] == '-' || token[0] == '+')
+                    {
+                        if (token.Length > 1 && Char.IsDigit(token[1]))
+                        {
+                            s2.Push(token);
+                            continue;
+                        }
+                    }
+
+                    if (token[0] != '!')
+                    {
+                        if (s2.Peek() == "t")
+                            num1 = 1;
+                        else if (s2.Peek() == "f")
+                            num1 = 0;
+                        else num1 = float.Parse(s2.Peek());
+                        s2.Pop();
+                        if (s2.Peek() == "t")
+                            num2 = 1;
+                        else if (s2.Peek() == "f")
+                            num2 = 0;
+                        else num2 = float.Parse(s2.Peek());
+                        s2.Pop();
+                    }
+                    else
+                    {
+                        if (s2.Peek() == "t")
+                            num1 = 1;
+                        else if (s2.Peek() == "f")
+                            num1 = 0;
+                        else num1 = float.Parse(s2.Peek());
+                        s2.Pop();
+                    }
+
+
+                    switch (token[0])
+                    {
+                        case '+': this.answer = num2 + num1; break;
+                        case '-': this.answer = num2 - num1; break;
+                        case '*': this.answer = num2 * num1; break;
+                        case '/': this.answer = num2 / num1; break;
+                        case '%': this.answer = num2 % num1; break;
+                        case '<':
+                            ans = num2 < num1;
+                            if (ans) this.answer = 1;
+                            else this.answer = 0;
+                            break;
+                        case '>':
+                            ans = num2 > num1;
+                            if (ans) this.answer = 1;
+                            else this.answer = 0;
+                            break;
+                        case 'g':
+                            ans = num2 <= num1;
+                            if (ans) this.answer = 1;
+                            else this.answer = 0;
+                            break;
+                        case 'l':
+                            ans = num2 >= num1;
+                            if (ans) this.answer = 1;
+                            else this.answer = 0;
+                            break;
+                        case 'e':
+                            ans = num2 == num1;
+                            if (ans) this.answer = 1;
+                            else this.answer = 0;
+                            break;
+                        case 'n':
+                            ans = num2 != num1;
+                            if (ans) this.answer = 1;
+                            else this.answer = 0;
+                            break;
+                        case 'a':
+                            if (num2 == 1 || num2 == 't') x2 = true; else if (num2 == 0 || num2 == 'f') x2 = false;
+                            if (num1 == 1 || num1 == 't') x1 = true; else if (num1 == 0 || num1 == 'f') x1 = false;
+                            if (x1 == true && x2 == true)
+                            {
+                                ans = true; this.answer = 1;
+                            }
+                            else this.answer = 0;
+                            break;
+                        case 'o':
+                            if (num2 == 1 || num2 == 't') x2 = true; else if (num2 == 0 || num2 == 'f') x2 = false;
+                            if (num1 == 1 || num1 == 't') x1 = true; else if (num1 == 0 || num1 == 'f') x1 = false;
+                            if (x1 == true || x2 == true)
+                            {
+                                ans = true; this.answer = 1;
+                            }
+                            else this.answer = 0;
+                            break;
+                        case '!':
+                            if (num1 == 1 || num1 == 't') x1 = true; else if (num1 == 0 || num1 == 'f') x1 = false;
+                            if (x1 == true)
+                            {
+                                ans = false; this.answer = 0;
+                            }
+                            else this.answer = 1;
+                            break;
+                    }
+                    temp_ans = this.answer.ToString();
+                    s2.Push(temp_ans);
+                }
+
+                else if (token.Length != 0 && (Char.IsDigit(token[0]) || token[0] == 't' || token[0] == 'f'))
+                {
+                    //converting string to float
+                    s2.Push(token);
+
+                }
+            }
+
+            if (!IsEmpty(s2))
+                s2.Pop();
+
+            return answer;
+        }
 
 
 
