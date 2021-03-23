@@ -33,6 +33,7 @@ namespace CFPL_Interpreter
         }
         public int Parse()
         {
+            Console.Clear();
             List<string> varList = new List<string>();
             Dictionary<string, double> declared = new Dictionary<string, double>();
             object temp;
