@@ -144,27 +144,6 @@ namespace CFPL_Interpreter
                         tokens.Add(new Tokens(TokenType.MOD, a.ToString(), null, line));
                         char_counter++;
                         break;
-                    case '\'':
-                        tokens.Add(new Tokens(TokenType.SQUOTE, a.ToString(), null, line));
-                        char_counter++;
-                        if (currString[char_counter + 2] == '\'')
-                        {
-                            tokens.Add(new Tokens(TokenType.CHAR_LIT, a.ToString(), null, line));
-                            char_counter++;
-                            tokens.Add(new Tokens(TokenType.CQUOTE, a.ToString(), null, line));
-                            char_counter++;
-                        }
-                        else
-                        {
-                            errorMsg.Add(string.Format("Missing ' at line {0}", line + 1));
-                        }
-
-
-                        break;
-                    case '\"':
-                        tokens.Add(new Tokens(TokenType.DQUOTE, a.ToString(), null,line));
-                        char_counter++;
-                        break;
                     default:
                         if (isDigit(a))
                         {
