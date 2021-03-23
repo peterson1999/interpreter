@@ -38,7 +38,7 @@ namespace CFPL_Interpreter
             Dictionary<string, double> declared = new Dictionary<string, double>();
             object temp;
             string temp_identifier = "";
-           while(tCounter < tokens.Count)
+            while(tCounter < tokens.Count)
             {
                 switch (tokens[tCounter].Type)
                 {
@@ -46,7 +46,6 @@ namespace CFPL_Interpreter
                         //Console.WriteLine("Dsadas");
                         if (!hasStart)
                         {
-                            
                             tCounter++;
                             if (tokens[tCounter].Type == TokenType.IDENTIFIER)
                             {
@@ -58,59 +57,58 @@ namespace CFPL_Interpreter
                                     
                                     temp_identifier = tokens[tCounter-1].Lexeme;
                                     tCounter++;
-                                    
-                                    if (tokens[tCounter].Type == TokenType.INT_LIT)
-                                        {
 
-                                        
+                                    if (tokens[tCounter].Type == TokenType.INT_LIT)
+                                    {
                                         declared.Add(temp_identifier, (int)tokens[tCounter].Literal);
                                         tCounter++;
-                                       // Console.WriteLine(temp_identifier +"tempidenitifier");
+                                        // Console.WriteLine(temp_identifier +"tempidenitifier");
                                     }
-                                        else if (tokens[tCounter].Type == TokenType.FLOAT_LIT)
-                                        {
+                                    else if (tokens[tCounter].Type == TokenType.FLOAT_LIT)
+                                    {
                                         declared.Add(temp_identifier, (double)tokens[tCounter].Literal);
                                         tCounter++;
 
                                         //map[temp_identifier] = temp;
                                     }
-                                        //unary add
-                                        else if (tokens[tCounter].Type == TokenType.ADD)
+                                    //unary add
+                                    else if (tokens[tCounter].Type == TokenType.ADD)
+                                    {
+                                        tCounter++;
+                                        if (tokens[tCounter].Type == TokenType.INT_LIT)
                                         {
-                                            tCounter++;
-                                            if (tokens[tCounter].Type == TokenType.INT_LIT)
-                                            {
-                                            declared.Add(temp_identifier, ((int)tokens[tCounter].Literal)*1);
+                                            declared.Add(temp_identifier, ((int)tokens[tCounter].Literal) * 1);
                                             tCounter++;
                                             //map[temp_identifier] = temp;
                                         }
-                                            else if (tokens[tCounter].Type == TokenType.FLOAT_LIT)
-                                            {
+                                        else if (tokens[tCounter].Type == TokenType.FLOAT_LIT)
+                                        {
                                             declared.Add(temp_identifier, ((double)(tokens[tCounter].Literal)) * 1);
                                             tCounter++;
                                             // map[temp_identifier] = temp;
                                         }
-                                        }
-                                        else if (tokens[tCounter].Type == TokenType.SUBT)
+                                    }
+                                    else if (tokens[tCounter].Type == TokenType.SUBT)
+                                    {
+                                        tCounter++;
+                                        if (tokens[tCounter].Type == TokenType.INT_LIT)
                                         {
-                                            tCounter++;
-                                            if (tokens[tCounter].Type == TokenType.INT_LIT)
-                                            {
-                                            declared.Add(temp_identifier, ((int)tokens[tCounter].Literal) * -1); 
+                                            declared.Add(temp_identifier, ((int)tokens[tCounter].Literal) * -1);
                                             tCounter++;
                                             // map[temp_identifier] = temp;
                                         }
-                                            else if (tokens[tCounter].Type == TokenType.FLOAT_LIT)
-                                            {
-                                            
-                                            declared.Add(temp_identifier, ((double)(tokens[tCounter].Literal))*-1);
+                                        else if (tokens[tCounter].Type == TokenType.FLOAT_LIT)
+                                        {
+                                            declared.Add(temp_identifier, ((double)(tokens[tCounter].Literal)) * -1);
                                             tCounter++;
                                             //map[temp_identifier] = temp;
                                         }
-                                        }
-                                    
-                                   
-
+                                    }
+                                    else
+                                    {
+                                        errorMsg.Add(string.Format("Syntax Error commited at line {0}.", tokens[tCounter].Line));
+                                        tCounter++;
+                                    }
                                 }
                                 while (tokens[tCounter].Type == TokenType.COMMA)
                                 {
@@ -125,11 +123,9 @@ namespace CFPL_Interpreter
 
                                             temp_identifier = tokens[tCounter - 1].Lexeme;
                                             tCounter++;
-                                            
+
                                             if (tokens[tCounter].Type == TokenType.INT_LIT)
                                             {
-
-
                                                 declared.Add(temp_identifier, (int)tokens[tCounter].Literal);
                                                 tCounter++;
                                                 // Console.WriteLine(temp_identifier +"tempidenitifier");
@@ -165,7 +161,7 @@ namespace CFPL_Interpreter
                                                 {
                                                     declared.Add(temp_identifier, ((int)tokens[tCounter].Literal) * -1);
                                                     tCounter++;
-                                                    
+
                                                     // map[temp_identifier] = temp;
                                                 }
                                                 else if (tokens[tCounter].Type == TokenType.FLOAT_LIT)
@@ -175,9 +171,14 @@ namespace CFPL_Interpreter
                                                     //map[temp_identifier] = temp;
                                                 }
                                             }
-                                    }
+                                            else
+                                            {
+                                                errorMsg.Add(string.Format("Syntax Error commited at line {0}.", tokens[tCounter].Line));
+                                                tCounter++;
+                                            }
+                                        }
                                     
-                                }
+                                    }
                                     else
                                     {
                                         errorMsg.Add(string.Format("Syntax Error. Excess comma at line {0}.", tokens[tCounter].Line));
