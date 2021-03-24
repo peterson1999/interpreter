@@ -74,8 +74,15 @@ namespace CFPL_Interpreter
                         char_counter++;
                         break;
                     case '*':
-                        tokens.Add(new Tokens(TokenType.MULT, a.ToString(), null, line));
-                        char_counter++;
+                        if(char_counter==0)
+                        {
+                            while (char_counter != charArrLength) { char_counter++;}
+                        }
+                        else
+                        {
+                            tokens.Add(new Tokens(TokenType.MULT, a.ToString(), null, line));
+                            char_counter++;
+                        }
                         break;
                     case '(':
                         tokens.Add(new Tokens(TokenType.LEFT_PAREN, a.ToString(), null, line));

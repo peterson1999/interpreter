@@ -36,11 +36,14 @@ namespace CFPL_Interpreter
         }
         public int Parse()
         {
+            Console.Clear();
             List<string> varList = new List<string>();
             Dictionary<string, double> declared = new Dictionary<string, double>();
             object temp;
             string temp_identifier = "";
+
             while (tCounter < tokens.Count)
+
             {
                 switch (tokens[tCounter].Type)
                 {
@@ -61,8 +64,10 @@ namespace CFPL_Interpreter
                                     temp_identifier = tokens[tCounter - 1].Lexeme;
                                     tCounter++;
 
+
                                     if (tokens[tCounter].Type == TokenType.INT_LIT)
                                     {
+
 
 
                                         declared.Add(temp_identifier, (int)tokens[tCounter].Literal);
@@ -111,7 +116,11 @@ namespace CFPL_Interpreter
                                         }
                                     }
 
-
+                                    else
+                                    {
+                                        errorMsg.Add(string.Format("Syntax Error commited at line {0}.", tokens[tCounter].Line));
+                                        tCounter++;
+                                    }
 
                                 }
                                 while (tokens[tCounter].Type == TokenType.COMMA)
@@ -130,8 +139,6 @@ namespace CFPL_Interpreter
 
                                             if (tokens[tCounter].Type == TokenType.INT_LIT)
                                             {
-
-
                                                 declared.Add(temp_identifier, (int)tokens[tCounter].Literal);
                                                 tCounter++;
                                                 // Console.WriteLine(temp_identifier +"tempidenitifier");
@@ -177,7 +184,14 @@ namespace CFPL_Interpreter
                                                     //map[temp_identifier] = temp;
                                                 }
                                             }
+
+                                            else
+                                            {
+                                                errorMsg.Add(string.Format("Syntax Error commited at line {0}.", tokens[tCounter].Line));
+                                                tCounter++;
+                                            }
                                         }
+                                    
 
                                     }
                                     else
