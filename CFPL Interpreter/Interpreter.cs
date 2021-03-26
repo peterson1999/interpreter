@@ -15,6 +15,7 @@ namespace CFPL_Interpreter
         private List<Tokens> tokens;
         private static bool hasStop;
         private static bool hasStart;
+        private static int nested = 0;
         int flagif = 0, ifcount=0,startcount=0,stopcount=0;
         Regex boolxpression = new Regex(@"(?x)^(\s)*IF (\s)*( (NOT)* (-|\+)? (\s)* [a-zA-Z_$][a-zA-Z_$0-9]*(\s)*(=)(\s)*)* (NOT)* (?> (-|\+)? (\s)* (?<p> \( )* (?>(-|\+)? (\s)* (\d+(?:\.\d+)?|[a-zA-Z_$][a-zA-Z_$0-9]*|(""TRUE""|""FALSE""))) (?<-p> \) )* )
                 (?> (?: (\s)* (-|\+|\*|/|%|>|<|(<>)|(==)|(>=)|(<=)|AND|OR|NOT) (\s)* (?> (?<p> \( )* (?>(-|\+)? (\s)* (\d+(?:\.\d+)?|[a-zA-Z_$][a-zA-Z_$0-9]*|(""TRUE""|""FALSE""))) (\s)* (?<-p> \) )* ))+) (?(p)(?!))$");
@@ -283,7 +284,6 @@ namespace CFPL_Interpreter
                             break;
                         case TokenType.IDENTIFIER:
                             temp_identifier = tokens[tCounter++].Lexeme;
-
                             if (tokens[tCounter].Type == TokenType.EQUALS)
                             {
 
@@ -296,7 +296,7 @@ namespace CFPL_Interpreter
                                     {
                                         if (tokens[tCounter2].Type == TokenType.IDENTIFIER)
                                         {
-                                            Console.WriteLine(map[tokens[tCounter2].Lexeme]);
+                                           // Console.WriteLine(map[tokens[tCounter2].Lexeme]);
                                             s += map[tokens[tCounter2].Lexeme];
                                         }
                                         else
@@ -328,6 +328,8 @@ namespace CFPL_Interpreter
                                         {
                                             temp = (int)tokens[tCounter].Literal;
                                             map[temp_identifier] = temp;
+                                            Console.WriteLine(temp);
+
                                         }
                                         else if (tokens[tCounter].Type == TokenType.FLOAT_LIT)
                                         {
@@ -391,28 +393,35 @@ namespace CFPL_Interpreter
                             //error statement (token is not =, INT_LIT, nor FLOAT_LIT)
                             break;
                         case TokenType.START:
-                            if (hasStart && ((startcount)!=ifcount))
+                            startcount++;
+                            if (hasStart && ((startcount)>ifcount+1))
                             {
+                                Console.WriteLine("error startcount:" + startcount + " ifcount:" + ifcount);
                                 errorMsg.Add(string.Format("Syntax error. Incorrect usage of START at line {0}", tokens[tCounter].Line));
                                 //error = -10;
                             }
                             else {
                                 hasStart = true;
-                                startcount++;
+                                
+                                //Console.WriteLine("startcount:" + startcount + " ifcount:" + ifcount + "Line:"+ tokens[tCounter].Line);
                                 //Console.WriteLine(tokens[tCounter].Lexeme);
                             }
                             tCounter++;
                             break;
                         case TokenType.STOP:
-                            if (hasStop && ((stopcount) != ifcount))
-                            {
+                            stopcount++;
+
+                            if (hasStop && ((stopcount) > ifcount + 1)) { 
+
+                                Console.WriteLine(stopcount+"stopcount");
                                 errorMsg.Add(string.Format("Syntax error. Incorrect usage of STOP at line {0}", tokens[tCounter].Line));
                                 //error = -10;
                             }
                             else
                             {
+                                //nested--;
                                 hasStop = true;
-                                stopcount++;
+                                Console.WriteLine("stopcount:" + stopcount +" ifcount:"+ifcount);
                                 //Console.WriteLine(tokens[tCounter ].Lexeme);
                                 //Console.WriteLine(tokens[tCounter-1].Lexeme);
                             }
@@ -572,41 +581,57 @@ namespace CFPL_Interpreter
                             }
                             break;
                         case TokenType.IF:
-                            
-                            tCounter++;
                             string exp = "";
-                            if (tokens[tCounter].Type == TokenType.LEFT_PAREN)
+                            tCounter++;
+                            if (tokens[tCounter].Type == TokenType.LEFT_PAREN) //check the statement
                             {
                                 tCounter++;
                                 while(tokens[tCounter].Type != TokenType.RIGHT_PAREN)
                                 {
-                                    exp += tokens[tCounter].Lexeme;
+                                    exp += tokens[tCounter].Lexeme;   //puts statement in string
                                    
                                     tCounter++;
                                 }
                                 //Console.WriteLine(exp);
-                                if (IsValid(exp))
+                                if (IsValid(exp)) //check if statement is valid (wala pa logical and variables, ako ra e add)
                                 {
                                     string s2 = addSpace(exp);
                                     //Console.WriteLine("WITH SPACE:" + s2);
                                     //convertToPostfix(s2);
                                     //Console.WriteLine(string.Join("", postfix));
                                     
-                                    if (5 > 5)
+                                    if (5 > 5) // wala pa man logical so ge hardcode lang sa nako
                                     {
-                                        ifcount++;
+                                        ifcount++;  
                                         flagif = 1;
                                         tCounter++;
                                         //Console.WriteLine(tokens[tCounter].Lexeme);
                                     }
-                                    else
+                                    else   //if "if statement" is false
                                     {
-                                        Console.WriteLine("SUCCESS1");
-                                        while (tokens[tCounter].Type != TokenType.STOP)
-                                        {
-                                            tCounter++;
-                                        }
-                                        tCounter++;
+                                        nested++;
+                                        Console.WriteLine("start nested:" + nested);
+                                        while (nested != 0)   //checks for nests and looks for stops (basically skips everything)
+                                            {
+                                            
+                                            if (tokens[tCounter].Type == TokenType.STOP)
+                                                {
+
+                                                    nested--;
+                                                    
+                                                }
+
+                                                else if (tokens[tCounter].Type == TokenType.IF || tokens[tCounter].Type == TokenType.ELSE)
+                                                {
+                                                    nested++;
+                                                }
+
+                                                tCounter++;
+
+                                            }
+                                        
+                                        Console.WriteLine("started nested:"+nested+" next:"+ tokens[tCounter].Lexeme + "Line:" + tokens[tCounter].Line);
+                                       // tCounter++;
                                     }
                                 }
                                 
@@ -616,24 +641,45 @@ namespace CFPL_Interpreter
                         case TokenType.ELSE:
 
                             Console.WriteLine("DASDAS");
-                            tCounter++;
                             
-                            if (flagif!=1)
+                          
+                            
+                            if (flagif!=1) //if "if statement" is false
                             {
+                                //startcount--;
                                 ifcount++;
                                 Console.WriteLine("SUCCESS");
+                                tCounter++;
                                 break;
+                                
 
                             }
-                            else
+                            else //same sa if statement
                             {
-                                while (tokens[tCounter].Type != TokenType.STOP)
-                                {
-                                    
-                                    tCounter++;
-                                }
+                                nested++;
                                 tCounter++;
-                                
+                                Console.WriteLine("Nested beginning:" + nested);
+                                while (nested != 0)
+                                {
+                                    if (tokens[tCounter].Type == TokenType.STOP)
+                                    {
+
+                                        nested--;
+                                        Console.WriteLine("seen stop:else nested:" + nested + "Line:" + tokens[tCounter].Line);
+                                    }
+
+                                    else if (tokens[tCounter].Type == TokenType.IF || tokens[tCounter].Type == TokenType.ELSE)
+                                    {
+                                        nested++;
+                                        Console.WriteLine("seen if/else else nested:" + nested + "Line:" + tokens[tCounter].Line);
+                                    }
+
+                                    tCounter++;
+
+                                }
+
+                                Console.WriteLine("else nested:" + nested + " next:" + tokens[tCounter].Lexeme + "Line:" + tokens[tCounter].Line);
+                                // tCounter++;
                             }
 
                             break;
@@ -719,7 +765,7 @@ namespace CFPL_Interpreter
                     return false;
                 }
             }
-            //Console.WriteLine(tempString);
+            Console.WriteLine(tempString);
             operators = new Regex(@"[().]", RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
             tempString = operators.Replace(tempString, string.Empty);
             //Console.WriteLine(tempString);
