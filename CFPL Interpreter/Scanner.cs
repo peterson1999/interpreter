@@ -102,6 +102,8 @@ namespace CFPL_Interpreter
                         else
                         {
                             tokens.Add(new Tokens(TokenType.GREATER, a.ToString(), null, line));
+                            char_counter ++;
+                    
                         }
                         break;
                     case '<':
@@ -264,6 +266,12 @@ namespace CFPL_Interpreter
                     break;
                 case "OUTPUT":
                     tokens.Add(new Tokens(TokenType.OUTPUT, temp, null, line));
+                    break;
+                case "IF":
+                    tokens.Add(new Tokens(TokenType.IF, temp, null, line));
+                    break;
+                case "ELSE":
+                    tokens.Add(new Tokens(TokenType.ELSE, temp, null, line));
                     break;
                 default:
                     tokens.Add(new Tokens(TokenType.IDENTIFIER, temp, null, line));
