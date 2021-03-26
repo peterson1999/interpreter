@@ -431,6 +431,7 @@ namespace CFPL_Interpreter
 
                             break;
                         case TokenType.INPUT:
+                            
                             tCounter++;
                             if (tokens[tCounter].Type == TokenType.COLON)
                             {
@@ -521,10 +522,20 @@ namespace CFPL_Interpreter
                                         }
                                         else if (tokens[tCounter].Type == TokenType.LEFT_BRACE)
                                         {
+                                            //Console.WriteLine("DSADAS");
                                             tCounter++;
-                                            if (tokens[tCounter].Type == TokenType.SHARP)
+                                            if (tokens[tCounter].Type == TokenType.SHARP || tokens[tCounter].Type == TokenType.AMPERSAND || tokens[tCounter].Type == TokenType.LEFT_BRACE || tokens[tCounter].Type == TokenType.RIGHT_BRACE)
                                             {
-                                                char sharp = '#';
+                                                string special = tokens[tCounter].Lexeme;
+                                                if (special[0] == '[')
+                                                {
+                                                    
+                                                    if ((tokens[tCounter + 1].Type == TokenType.RIGHT_BRACE && tokens[tCounter + 2].Type == TokenType.RIGHT_BRACE)){
+
+                                                        special += tokens[tCounter + 1].Lexeme;
+                                                        tCounter++;
+                                                    }
+                                                }
                                                 //Console.WriteLine(tokens[tCounter].Lexeme);
                                                 tCounter++;
                                                 if (tokens[tCounter].Type == TokenType.RIGHT_BRACE)
@@ -532,7 +543,7 @@ namespace CFPL_Interpreter
                                                     tCounter++;
                                                     if (tokens[tCounter].Type == TokenType.D_QUOTE)
                                                     {
-                                                        Console.WriteLine(sharp);
+                                                        Console.WriteLine(special);
                                                         tCounter++;
                                                         continue;
                                                     }
@@ -575,10 +586,10 @@ namespace CFPL_Interpreter
                                         continue;
                                     }
                                 }
-                                if (notIden == 1)
-                                {
-                                    errorMsg.Add(string.Format("Token after INPUT is not a variable name. Error at line {0}.", tokens[tCounter].Line));
-                                }
+                                //if (notIden == 1)
+                               // {
+                               //     errorMsg.Add(string.Format("Token after INPUT is not a variable name. Error at line {0}.", tokens[tCounter].Line));
+                              //  }
 
                             }
                             break;
