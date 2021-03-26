@@ -16,7 +16,7 @@ namespace CFPL_Interpreter
         private static bool hasStop;
         private static bool hasStart;
         private static int nested = 0;
-        int flagif = 0, ifcount=0,startcount=0,stopcount=0;
+        int flagif = 1, ifcount=0,startcount=0,stopcount=0;
         Regex boolxpression = new Regex(@"(?x)^(\s)*IF (\s)*( (NOT)* (-|\+)? (\s)* [a-zA-Z_$][a-zA-Z_$0-9]*(\s)*(=)(\s)*)* (NOT)* (?> (-|\+)? (\s)* (?<p> \( )* (?>(-|\+)? (\s)* (\d+(?:\.\d+)?|[a-zA-Z_$][a-zA-Z_$0-9]*|(""TRUE""|""FALSE""))) (?<-p> \) )* )
                 (?> (?: (\s)* (-|\+|\*|/|%|>|<|(<>)|(==)|(>=)|(<=)|AND|OR|NOT) (\s)* (?> (?<p> \( )* (?>(-|\+)? (\s)* (\d+(?:\.\d+)?|[a-zA-Z_$][a-zA-Z_$0-9]*|(""TRUE""|""FALSE""))) (\s)* (?<-p> \) )* ))+) (?(p)(?!))$");
         Regex booloperator = new Regex(@"(?x)^(\s)*([a-zA-Z_$][a-zA-Z_$0-9]*(\s)*(=)(\s)*)( (NOT)* (-|\+)? (\s)* [a-zA-Z_$][a-zA-Z_$0-9]*(\s)*(=)(\s)*)* (NOT)* (?> (-|\+)? (\s)* (?<p> \( )* (?>(-|\+)? (\s)* (\d+(?:\.\d+)?|[a-zA-Z_$][a-zA-Z_$0-9]*|(""TRUE""|""FALSE""))) (?<-p> \) )* )
@@ -309,11 +309,13 @@ namespace CFPL_Interpreter
                                     if (IsValid(s))
                                     {
                                         string s2 = addSpace(s);
-                                        //Console.WriteLine("WITH SPACE:" + s2);
+                                        Console.WriteLine("WITH SPACE:" + s2);
                                         convertToPostfix(s2);
-                                        //Console.WriteLine(string.Join("", postfix));
+                                        Console.WriteLine(string.Join("", postfix));
                                         answer = evaluatePostfix();
-                                        Console.WriteLine(answer);
+                                        Console.WriteLine("answer:"+answer);
+                                            
+
 
                                         temp = answer;
                                         map[temp_identifier] = temp;
@@ -328,7 +330,7 @@ namespace CFPL_Interpreter
                                         {
                                             temp = (int)tokens[tCounter].Literal;
                                             map[temp_identifier] = temp;
-                                            Console.WriteLine(temp);
+                                            Console.WriteLine("temp"+temp);
 
                                         }
                                         else if (tokens[tCounter].Type == TokenType.FLOAT_LIT)
@@ -555,7 +557,7 @@ namespace CFPL_Interpreter
                                         }
                                         else
                                         {
-                                            Console.Write(tokens[tCounter].Lexeme);//else print token
+                                            //Console.Write(tokens[tCounter].Lexeme);//else print token
                                             tCounter++;
                                         }
                                         if (tokens[tCounter].Type == TokenType.D_QUOTE)
@@ -600,7 +602,7 @@ namespace CFPL_Interpreter
                                     //convertToPostfix(s2);
                                     //Console.WriteLine(string.Join("", postfix));
                                     
-                                    if (5 > 5) // wala pa man logical so ge hardcode lang sa nako
+                                    if (5 >= 5) // wala pa man logical so ge hardcode lang sa nako
                                     {
                                         ifcount++;  
                                         flagif = 1;
@@ -609,6 +611,7 @@ namespace CFPL_Interpreter
                                     }
                                     else   //if "if statement" is false
                                     {
+                                        flagif = 0;
                                         nested++;
                                         Console.WriteLine("start nested:" + nested);
                                         while (nested != 0)   //checks for nests and looks for stops (basically skips everything)
@@ -648,6 +651,7 @@ namespace CFPL_Interpreter
                             {
                                 //startcount--;
                                 ifcount++;
+                                flagif = 1;
                                 Console.WriteLine("SUCCESS");
                                 tCounter++;
                                 break;
@@ -741,6 +745,19 @@ namespace CFPL_Interpreter
             {
                 return false;
             }
+            else
+            {
+                int alldigit = 1;
+                foreach( char c in input)
+                {
+                    if (!Char.IsNumber(c))
+                    {
+                        alldigit = 0;
+                        break;
+                    }
+                }
+                if (alldigit == 1){ return false; }
+            }
             if (input.ToCharArray().Select(c => c == '(').Count() != input.ToCharArray().Select(c => c == ')').Count())
             {
                 Console.WriteLine("error2");
@@ -765,10 +782,10 @@ namespace CFPL_Interpreter
                     return false;
                 }
             }
-            Console.WriteLine(tempString);
+            Console.WriteLine("tempstring"+tempString);
             operators = new Regex(@"[().]", RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
             tempString = operators.Replace(tempString, string.Empty);
-            //Console.WriteLine(tempString);
+            Console.WriteLine(tempString);
             foreach (char c in tempString.ToCharArray())
             {
                 if (!Char.IsNumber(c))
@@ -907,7 +924,7 @@ namespace CFPL_Interpreter
             float num1 = 0, num2 = 0;
 
             string temp = string.Join("", postfix);
-            //Console.WriteLine(temp);
+            Console.WriteLine(temp);
             string[] tokens = temp.Split(' ');
             Stack<float> s2 = new Stack<float>();
 
@@ -944,6 +961,7 @@ namespace CFPL_Interpreter
                 {
                     //converting string to float
                     s2.Push(float.Parse(token));
+                    Console.WriteLine("peek:" + s2.Peek());
                 }
             }
 
