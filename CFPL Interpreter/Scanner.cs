@@ -152,8 +152,11 @@ namespace CFPL_Interpreter
                         }
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
                         break;
 =======
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
                         else if (isBoolChar(a))

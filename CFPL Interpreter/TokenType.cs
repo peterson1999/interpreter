@@ -38,6 +38,9 @@ namespace CFPL_Interpreter
         BOOL, FLOAT, CHAR,
         AND, OR, NOT, INPUT, TRUE, FALSE
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
