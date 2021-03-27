@@ -151,8 +151,11 @@ namespace CFPL_Interpreter
                             break;
                         }
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
                         break;
 =======
+=======
+>>>>>>> Stashed changes
                         else if (isBoolChar(a))
                         {
                             boolCharVal(a);

@@ -37,6 +37,9 @@ namespace CFPL_Interpreter
         WHILE, START, STOP, INT,
         BOOL, FLOAT, CHAR,
         AND, OR, NOT, INPUT, TRUE, FALSE
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
     }
 }

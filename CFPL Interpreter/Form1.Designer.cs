@@ -34,6 +34,7 @@
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.richTextBox2 = new System.Windows.Forms.RichTextBox();
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.button1 = new System.Windows.Forms.Button();
             this.fastColoredTextBox1 = new FastColoredTextBoxNS.FastColoredTextBox();
@@ -44,6 +45,11 @@
             this.button2 = new System.Windows.Forms.Button();
             this.button1 = new System.Windows.Forms.Button();
             this.fastColoredTextBox1 = new FastColoredTextBoxNS.FastColoredTextBox();
+=======
+            this.button2 = new System.Windows.Forms.Button();
+            this.button1 = new System.Windows.Forms.Button();
+            this.fastColoredTextBox1 = new FastColoredTextBoxNS.FastColoredTextBox();
+>>>>>>> Stashed changes
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.newToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -120,6 +126,7 @@
             this.richTextBox2.Text = "";
             // 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
             // groupBox1
             // 
             this.groupBox1.BackColor = System.Drawing.SystemColors.ButtonHighlight;
@@ -133,6 +140,8 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Controls";
 =======
+=======
+>>>>>>> Stashed changes
             // button2
             // 
             this.button2.BackColor = System.Drawing.Color.NavajoWhite;
@@ -191,6 +200,7 @@
             this.fastColoredTextBox1.Load += new System.EventHandler(this.fastColoredTextBox1_Load);
             // 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
             // button2
             // 
             this.button2.BackColor = System.Drawing.Color.NavajoWhite;
@@ -220,6 +230,8 @@
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Input";
 =======
+=======
+>>>>>>> Stashed changes
             // menuStrip1
             // 
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -363,6 +375,7 @@
             this.Name = "Form1";
             this.Text = "Form1";
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.groupBox1.ResumeLayout(false);
@@ -370,6 +383,9 @@
             this.groupBox2.ResumeLayout(false);
 =======
             ((System.ComponentModel.ISupportInitialize)(this.fastColoredTextBox1)).EndInit();
+=======
+            ((System.ComponentModel.ISupportInitialize)(this.fastColoredTextBox1)).EndInit();
+>>>>>>> Stashed changes
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
 >>>>>>> Stashed changes
@@ -387,7 +403,10 @@
         private FastColoredTextBoxNS.FastColoredTextBox fastColoredTextBox1;
         private System.Windows.Forms.Button button2;
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 =======
+=======
+>>>>>>> Stashed changes
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem fileToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem newToolStripMenuItem;
