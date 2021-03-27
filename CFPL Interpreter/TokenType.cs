@@ -29,7 +29,14 @@ namespace CFPL_Interpreter
         BOOL_LIT,  //^(TRUE|FALSE)
 
         //RESERVED WORDS
+<<<<<<< Updated upstream
         VAR, AS, OUTPUT, IF, ELSE, WHILE, START, STOP, INT, BOOL, FLOAT, CHAR, EOF,
         AND, OR, NOT, INPUT
+=======
+        VAR, AS, OUTPUT, IF, ELSE,
+        WHILE, START, STOP, INT,
+        BOOL, FLOAT, CHAR,
+        AND, OR, NOT, INPUT, TRUE, FALSE
+>>>>>>> Stashed changes
     }
 }
