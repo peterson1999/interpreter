@@ -33,7 +33,7 @@ namespace CFPL_Interpreter
         BOOL_LIT,  //^(TRUE|FALSE)
 
         //RESERVED WORDS
-        VAR, AS, OUTPUT, IF, ELSE,
+        VAR, AS, OUTPUT, IF, ELSE, ELIF,
         WHILE, START, STOP, INT,
         BOOL, FLOAT, CHAR,
         AND, OR, NOT, INPUT, TRUE, FALSE
