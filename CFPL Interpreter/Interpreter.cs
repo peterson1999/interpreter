@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using System.Threading;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace CFPL_Interpreter
@@ -18,7 +15,7 @@ namespace CFPL_Interpreter
         private static bool isboolexp=false;
         private static int nested = 0;
         bool unknown1 = false, relational = false;
-        int flagif = 1, ifcount=0,startcount=0,stopcount=0;
+        int flagif = -1, ifcount=0,startcount=0,stopcount=0;
         private static Regex boolxpression = new Regex(@"(?x)^(\s)*IF (\s)*( (NOT)* (-|\+)? (\s)* [a-zA-Z_$][a-zA-Z_$0-9]*(\s)*(=)(\s)*)* (NOT)* (?> (-|\+)? (\s)* (?<p> \( )* (?>(-|\+)? (\s)* (\d+(?:\.\d+)?|[a-zA-Z_$][a-zA-Z_$0-9]*|(""TRUE""|""FALSE""))) (?<-p> \) )* )
                 (?> (?: (\s)* (-|\+|\*|/|%|>|<|(<>)|(==)|(>=)|(<=)|AND|OR|NOT) (\s)* (?> (?<p> \( )* (?>(-|\+)? (\s)* (\d+(?:\.\d+)?|[a-zA-Z_$][a-zA-Z_$0-9]*|(""TRUE""|""FALSE""))) (\s)* (?<-p> \) )* ))+) (?(p)(?!))$");
         Regex booloperator = new Regex(@"(?x)^(\s)*([a-zA-Z_$][a-zA-Z_$0-9]*(\s)*(=)(\s)*)( (NOT)* (-|\+)? (\s)* [a-zA-Z_$][a-zA-Z_$0-9]*(\s)*(=)(\s)*)* (NOT)* (?> (-|\+)? (\s)* (?<p> \( )* (?>(-|\+)? (\s)* (\d+(?:\.\d+)?|[a-zA-Z_$][a-zA-Z_$0-9]*|(""TRUE""|""FALSE""))) (?<-p> \) )* )
@@ -415,9 +412,10 @@ namespace CFPL_Interpreter
                         case TokenType.STOP:
                             stopcount++;
 
-                            if (hasStop && ((stopcount) > ifcount + 1)) { 
+                            if (hasStop && ((stopcount) > ifcount + 1)) {
 
-                               // Console.WriteLine(stopcount+"stopcount");
+                                // Console.WriteLine(stopcount+"stopcount");
+                                Console.WriteLine("stopcount:" + stopcount + " ifcount:" + ifcount + "Line:" + tokens[tCounter].Line);
                                 errorMsg.Add(string.Format("Syntax error. Incorrect usage of STOP at line {0}", tokens[tCounter].Line));
                                 //error = -10;
                             }
@@ -425,7 +423,7 @@ namespace CFPL_Interpreter
                             {
                                 //nested--;
                                 hasStop = true;
-                               // Console.WriteLine("stopcount:" + stopcount +" ifcount:"+ifcount);
+                                Console.WriteLine("stopcount:" + stopcount + " ifcount:" + ifcount + "Line:"+ tokens[tCounter].Line);
                                 //Console.WriteLine(tokens[tCounter ].Lexeme);
                                 //Console.WriteLine(tokens[tCounter-1].Lexeme);
                             }
@@ -636,6 +634,7 @@ namespace CFPL_Interpreter
                                     
                                     if (while_answer==1) // wala pa man logical so ge hardcode lang sa nako
                                     {
+                                        Console.WriteLine("IF Success Line:" + tokens[tCounter].Line);
                                         ifcount++;  
                                         flagif = 1;
                                         tCounter++;
@@ -653,19 +652,21 @@ namespace CFPL_Interpreter
                                                 {
 
                                                     nested--;
-                                                    
-                                                }
+                                                   Console.WriteLine("stopnested:" + nested+"Line:" + tokens[tCounter].Line);
+                                            }
 
-                                                else if (tokens[tCounter].Type == TokenType.IF || tokens[tCounter].Type == TokenType.ELSE)
+                                                else if (tokens[tCounter].Type == TokenType.IF || tokens[tCounter].Type == TokenType.ELSE ||  tokens[tCounter].Type == TokenType.ELIF)
                                                 {
-                                                    nested++;
-                                                }
+                                               
+                                                nested++;
+                                                Console.WriteLine("startnested:" + nested + "Line:" + tokens[tCounter].Line);
+                                            }
 
                                                 tCounter++;
 
                                             }
                                         
-                                        //Console.WriteLine("started nested:"+nested+" next:"+ tokens[tCounter].Lexeme + "Line:" + tokens[tCounter].Line);
+                                        Console.WriteLine("started nested:"+nested+" next:"+ tokens[tCounter].Lexeme + "Line:" + tokens[tCounter].Line);
                                        // tCounter++;
                                     }
                                 }
@@ -673,15 +674,98 @@ namespace CFPL_Interpreter
                             }
                             
                             break;
+
+                        case TokenType.ELIF:
+                            List<string> exp2 = new List<string>();
+                            string exp3 = "";
+                            int par3 = 0;
+                            tCounter++;
+                            if (tokens[tCounter].Type == TokenType.LEFT_PAREN) //check the statement
+                            {
+                                tCounter++;
+                                while ((tokens[tCounter].Type != TokenType.RIGHT_PAREN) || par3 != 0)
+                                {
+
+                                    if (tokens[tCounter].Type == TokenType.LEFT_PAREN)
+                                    {
+                                        par3++;
+                                    }
+                                    else if (tokens[tCounter].Type == TokenType.RIGHT_PAREN)
+                                    {
+                                        if (par3 == 0)
+                                        {
+
+                                            break;
+                                        }
+
+                                        par3--;
+                                    }
+                                    //  Console.WriteLine("Lexeme:" + tokens[tCounter].Lexeme);
+                                    exp2.Add(tokens[tCounter].Lexeme);   //puts statement in string
+                                    exp3 += tokens[tCounter].Lexeme;
+                                    tCounter++;
+                                }
+                                // Console.WriteLine(exp1);
+                                booleanOp(exp2);
+                                if (IsValid(exp3)) //check if statement is valid (wala pa logical and variables, ako ra e add)
+                                {
+                                    string s2 = addSpace(exp3);
+                                    //Console.WriteLine("WITH SPACE:" + s2);
+                                    //convertToPostfix(s2);
+                                    //Console.WriteLine(string.Join("", postfix));
+
+                                    if (while_answer == 1 && flagif==0) // wala pa man logical so ge hardcode lang sa nako
+                                    {
+                                        Console.WriteLine("ELIF Success Line:" + tokens[tCounter].Line);
+                                        ifcount++;
+                                        flagif = 1;
+                                        tCounter++;
+                                        //Console.WriteLine(tokens[tCounter].Lexeme);
+                                    }
+                                    else   //if "if statement" is false
+                                    {
+                                        //flagif = 0;
+                                        Console.WriteLine("ELIF fail");
+                                        nested++;
+                                        //  Console.WriteLine("start nested:" + nested);
+                                        while (nested != 0)   //checks for nests and looks for stops (basically skips everything)
+                                        {
+
+                                            if (tokens[tCounter].Type == TokenType.STOP)
+                                            {
+
+                                                nested--;
+                                                Console.WriteLine("stopnested:" + nested + "Line:" + tokens[tCounter].Line);
+                                            }
+
+                                            else if (tokens[tCounter].Type == TokenType.IF || tokens[tCounter].Type == TokenType.ELSE  || tokens[tCounter].Type == TokenType.ELIF)
+                                            {
+                                                nested++;
+                                                Console.WriteLine("startnested:" + nested + "Line:" + tokens[tCounter].Line);
+                                            }
+
+                                            tCounter++;
+
+                                        }
+
+                                        //Console.WriteLine("started nested:"+nested+" next:"+ tokens[tCounter].Lexeme + "Line:" + tokens[tCounter].Line);
+                                        // tCounter++;
+                                    }
+                                }
+
+                            }
+                            break;
+
                         case TokenType.ELSE:
 
                          //   Console.WriteLine("DASDAS");
                             
                           
                             
-                            if (flagif!=1) //if "if statement" is false
+                            if (flagif==0) //if "if statement" is false
                             {
                                 //startcount--;
+                                Console.WriteLine("ELSE Success Line:" + tokens[tCounter].Line);
                                 ifcount++;
                                 flagif = 1;
                              //   Console.WriteLine("SUCCESS");
@@ -701,13 +785,15 @@ namespace CFPL_Interpreter
                                     {
 
                                         nested--;
-                                  //      Console.WriteLine("seen stop:else nested:" + nested + "Line:" + tokens[tCounter].Line);
+                                        Console.WriteLine("stopnested:" + nested + "Line:" + tokens[tCounter].Line);
+                                        //      Console.WriteLine("seen stop:else nested:" + nested + "Line:" + tokens[tCounter].Line);
                                     }
 
-                                    else if (tokens[tCounter].Type == TokenType.IF || tokens[tCounter].Type == TokenType.ELSE)
+                                    else if (tokens[tCounter].Type == TokenType.IF || tokens[tCounter].Type == TokenType.ELSE || tokens[tCounter].Type == TokenType.ELIF)
                                     {
                                         nested++;
-                                 //       Console.WriteLine("seen if/else else nested:" + nested + "Line:" + tokens[tCounter].Line);
+                                        Console.WriteLine("startnested:" + nested + "Line:" + tokens[tCounter].Line);
+                                        //       Console.WriteLine("seen if/else else nested:" + nested + "Line:" + tokens[tCounter].Line);
                                     }
 
                                     tCounter++;

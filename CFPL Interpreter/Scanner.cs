@@ -273,6 +273,9 @@ namespace CFPL_Interpreter
                 case "ELSE":
                     tokens.Add(new Tokens(TokenType.ELSE, temp, null, line));
                     break;
+                case "ELIF":
+                    tokens.Add(new Tokens(TokenType.ELIF, temp, null, line));
+                    break;
                 case "AND":
                     tokens.Add(new Tokens(TokenType.AND, temp, null, line));
                     break;
