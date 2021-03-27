@@ -39,6 +39,9 @@ namespace CFPL_Interpreter
         AND, OR, NOT, INPUT, TRUE, FALSE
 <<<<<<< Updated upstream
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
