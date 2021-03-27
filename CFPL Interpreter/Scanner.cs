@@ -273,6 +273,21 @@ namespace CFPL_Interpreter
                 case "ELSE":
                     tokens.Add(new Tokens(TokenType.ELSE, temp, null, line));
                     break;
+                case "AND":
+                    tokens.Add(new Tokens(TokenType.AND, temp, null, line));
+                    break;
+                case "OR":
+                    tokens.Add(new Tokens(TokenType.OR, temp, null, line));
+                    break;
+                case "NOT":
+                    tokens.Add(new Tokens(TokenType.NOT, temp, null, line));
+                    break;
+                case "TRUE":
+                    tokens.Add(new Tokens(TokenType.TRUE, temp, null, line));
+                    break;
+                case "FALSE":
+                    tokens.Add(new Tokens(TokenType.FALSE, temp, null, line));
+                    break;
                 default:
                     tokens.Add(new Tokens(TokenType.IDENTIFIER, temp, null, line));
                     break;
