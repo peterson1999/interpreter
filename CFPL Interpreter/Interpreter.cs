@@ -15,14 +15,16 @@ namespace CFPL_Interpreter
         private List<Tokens> tokens;
         private static bool hasStop;
         private static bool hasStart;
+        private static bool isboolexp=false;
         private static int nested = 0;
+        bool unknown1 = false, relational = false;
         int flagif = 1, ifcount=0,startcount=0,stopcount=0;
-        Regex boolxpression = new Regex(@"(?x)^(\s)*IF (\s)*( (NOT)* (-|\+)? (\s)* [a-zA-Z_$][a-zA-Z_$0-9]*(\s)*(=)(\s)*)* (NOT)* (?> (-|\+)? (\s)* (?<p> \( )* (?>(-|\+)? (\s)* (\d+(?:\.\d+)?|[a-zA-Z_$][a-zA-Z_$0-9]*|(""TRUE""|""FALSE""))) (?<-p> \) )* )
+        private static Regex boolxpression = new Regex(@"(?x)^(\s)*IF (\s)*( (NOT)* (-|\+)? (\s)* [a-zA-Z_$][a-zA-Z_$0-9]*(\s)*(=)(\s)*)* (NOT)* (?> (-|\+)? (\s)* (?<p> \( )* (?>(-|\+)? (\s)* (\d+(?:\.\d+)?|[a-zA-Z_$][a-zA-Z_$0-9]*|(""TRUE""|""FALSE""))) (?<-p> \) )* )
                 (?> (?: (\s)* (-|\+|\*|/|%|>|<|(<>)|(==)|(>=)|(<=)|AND|OR|NOT) (\s)* (?> (?<p> \( )* (?>(-|\+)? (\s)* (\d+(?:\.\d+)?|[a-zA-Z_$][a-zA-Z_$0-9]*|(""TRUE""|""FALSE""))) (\s)* (?<-p> \) )* ))+) (?(p)(?!))$");
         Regex booloperator = new Regex(@"(?x)^(\s)*([a-zA-Z_$][a-zA-Z_$0-9]*(\s)*(=)(\s)*)( (NOT)* (-|\+)? (\s)* [a-zA-Z_$][a-zA-Z_$0-9]*(\s)*(=)(\s)*)* (NOT)* (?> (-|\+)? (\s)* (?<p> \( )* (?>(-|\+)? (\s)* (\d+(?:\.\d+)?|[a-zA-Z_$][a-zA-Z_$0-9]*|(""TRUE""|""FALSE""))) (?<-p> \) )* )
                 (?> (?: (\s)* (-|\+|\*|/|%|>|<|(<>)|(==)|(>=)|(<=)|AND|OR|NOT) (\s)* (?> (?<p> \( )* (?>(-|\+)? (\s)* (\d+(?:\.\d+)?|[a-zA-Z_$][a-zA-Z_$0-9]*|(""TRUE""|""FALSE""))) (\s)* (?<-p> \) )* ))+) (?(p)(?!))$");
-        float answer = 0;
-        private static int tCounter;
+        float answer = 0, while_answer=0;
+        private static int tCounter,tCounter2=0;
         char[] postfix = new char[100];
         private Dictionary<string, object> map;
         private static int error;
@@ -309,9 +311,9 @@ namespace CFPL_Interpreter
                                     if (IsValid(s))
                                     {
                                         string s2 = addSpace(s);
-                                        Console.WriteLine("WITH SPACE:" + s2);
+                                       // Console.WriteLine("WITH SPACE:" + s2);
                                         convertToPostfix(s2);
-                                        Console.WriteLine(string.Join("", postfix));
+                                      //  Console.WriteLine(string.Join("", postfix));
                                         answer = evaluatePostfix();
                                         Console.WriteLine("answer:"+answer);
                                             
@@ -330,7 +332,7 @@ namespace CFPL_Interpreter
                                         {
                                             temp = (int)tokens[tCounter].Literal;
                                             map[temp_identifier] = temp;
-                                            Console.WriteLine("temp"+temp);
+                                            //Console.WriteLine("temp"+temp);
 
                                         }
                                         else if (tokens[tCounter].Type == TokenType.FLOAT_LIT)
@@ -398,7 +400,7 @@ namespace CFPL_Interpreter
                             startcount++;
                             if (hasStart && ((startcount)>ifcount+1))
                             {
-                                Console.WriteLine("error startcount:" + startcount + " ifcount:" + ifcount);
+                               // Console.WriteLine("error startcount:" + startcount + " ifcount:" + ifcount);
                                 errorMsg.Add(string.Format("Syntax error. Incorrect usage of START at line {0}", tokens[tCounter].Line));
                                 //error = -10;
                             }
@@ -415,7 +417,7 @@ namespace CFPL_Interpreter
 
                             if (hasStop && ((stopcount) > ifcount + 1)) { 
 
-                                Console.WriteLine(stopcount+"stopcount");
+                               // Console.WriteLine(stopcount+"stopcount");
                                 errorMsg.Add(string.Format("Syntax error. Incorrect usage of STOP at line {0}", tokens[tCounter].Line));
                                 //error = -10;
                             }
@@ -423,7 +425,7 @@ namespace CFPL_Interpreter
                             {
                                 //nested--;
                                 hasStop = true;
-                                Console.WriteLine("stopcount:" + stopcount +" ifcount:"+ifcount);
+                               // Console.WriteLine("stopcount:" + stopcount +" ifcount:"+ifcount);
                                 //Console.WriteLine(tokens[tCounter ].Lexeme);
                                 //Console.WriteLine(tokens[tCounter-1].Lexeme);
                             }
@@ -594,18 +596,37 @@ namespace CFPL_Interpreter
                             }
                             break;
                         case TokenType.IF:
-                            string exp = "";
+                            List<string> exp1= new List<string>();
+                            string exp="";
+                            int par = 0;
                             tCounter++;
                             if (tokens[tCounter].Type == TokenType.LEFT_PAREN) //check the statement
                             {
                                 tCounter++;
-                                while(tokens[tCounter].Type != TokenType.RIGHT_PAREN)
+                                while((tokens[tCounter].Type != TokenType.RIGHT_PAREN) || par!=0)
                                 {
-                                    exp += tokens[tCounter].Lexeme;   //puts statement in string
-                                   
+
+                                    if (tokens[tCounter].Type == TokenType.LEFT_PAREN)
+                                    {
+                                        par++; 
+                                    }
+                                    else if(tokens[tCounter].Type == TokenType.RIGHT_PAREN)
+                                    {
+                                        if (par == 0)
+                                        {
+                                            
+                                            break;
+                                        }
+                                        
+                                        par--;
+                                    }
+                                  //  Console.WriteLine("Lexeme:" + tokens[tCounter].Lexeme);
+                                    exp1.Add(tokens[tCounter].Lexeme);   //puts statement in string
+                                    exp += tokens[tCounter].Lexeme;
                                     tCounter++;
                                 }
-                                //Console.WriteLine(exp);
+                               // Console.WriteLine(exp1);
+                                booleanOp(exp1);
                                 if (IsValid(exp)) //check if statement is valid (wala pa logical and variables, ako ra e add)
                                 {
                                     string s2 = addSpace(exp);
@@ -613,7 +634,7 @@ namespace CFPL_Interpreter
                                     //convertToPostfix(s2);
                                     //Console.WriteLine(string.Join("", postfix));
                                     
-                                    if (5 >= 5) // wala pa man logical so ge hardcode lang sa nako
+                                    if (while_answer==1) // wala pa man logical so ge hardcode lang sa nako
                                     {
                                         ifcount++;  
                                         flagif = 1;
@@ -624,7 +645,7 @@ namespace CFPL_Interpreter
                                     {
                                         flagif = 0;
                                         nested++;
-                                        Console.WriteLine("start nested:" + nested);
+                                      //  Console.WriteLine("start nested:" + nested);
                                         while (nested != 0)   //checks for nests and looks for stops (basically skips everything)
                                             {
                                             
@@ -644,7 +665,7 @@ namespace CFPL_Interpreter
 
                                             }
                                         
-                                        Console.WriteLine("started nested:"+nested+" next:"+ tokens[tCounter].Lexeme + "Line:" + tokens[tCounter].Line);
+                                        //Console.WriteLine("started nested:"+nested+" next:"+ tokens[tCounter].Lexeme + "Line:" + tokens[tCounter].Line);
                                        // tCounter++;
                                     }
                                 }
@@ -654,7 +675,7 @@ namespace CFPL_Interpreter
                             break;
                         case TokenType.ELSE:
 
-                            Console.WriteLine("DASDAS");
+                         //   Console.WriteLine("DASDAS");
                             
                           
                             
@@ -663,7 +684,7 @@ namespace CFPL_Interpreter
                                 //startcount--;
                                 ifcount++;
                                 flagif = 1;
-                                Console.WriteLine("SUCCESS");
+                             //   Console.WriteLine("SUCCESS");
                                 tCounter++;
                                 break;
                                 
@@ -673,27 +694,27 @@ namespace CFPL_Interpreter
                             {
                                 nested++;
                                 tCounter++;
-                                Console.WriteLine("Nested beginning:" + nested);
+                          //      Console.WriteLine("Nested beginning:" + nested);
                                 while (nested != 0)
                                 {
                                     if (tokens[tCounter].Type == TokenType.STOP)
                                     {
 
                                         nested--;
-                                        Console.WriteLine("seen stop:else nested:" + nested + "Line:" + tokens[tCounter].Line);
+                                  //      Console.WriteLine("seen stop:else nested:" + nested + "Line:" + tokens[tCounter].Line);
                                     }
 
                                     else if (tokens[tCounter].Type == TokenType.IF || tokens[tCounter].Type == TokenType.ELSE)
                                     {
                                         nested++;
-                                        Console.WriteLine("seen if/else else nested:" + nested + "Line:" + tokens[tCounter].Line);
+                                 //       Console.WriteLine("seen if/else else nested:" + nested + "Line:" + tokens[tCounter].Line);
                                     }
 
                                     tCounter++;
 
                                 }
 
-                                Console.WriteLine("else nested:" + nested + " next:" + tokens[tCounter].Lexeme + "Line:" + tokens[tCounter].Line);
+                             //   Console.WriteLine("else nested:" + nested + " next:" + tokens[tCounter].Lexeme + "Line:" + tokens[tCounter].Line);
                                 // tCounter++;
                             }
 
@@ -746,7 +767,13 @@ namespace CFPL_Interpreter
 
         public static bool IsValid(string input)
         {
+            //bool boolexprflag;
             Regex operators = new Regex(@"[\-+*/%<>==!]", RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
+            if (isboolexp == true)
+            {
+                isboolexp = false;
+                return true;
+            }
             if (string.IsNullOrEmpty(input))
             {
                 Console.WriteLine("error1");
@@ -767,6 +794,7 @@ namespace CFPL_Interpreter
                         break;
                     }
                 }
+                //Console.WriteLine("alldigit:" + alldigit);
                 if (alldigit == 1){ return false; }
             }
             if (input.ToCharArray().Select(c => c == '(').Count() != input.ToCharArray().Select(c => c == ')').Count())
@@ -784,7 +812,7 @@ namespace CFPL_Interpreter
             }
 
             string[] contains = new string[] { "(.)", "()", "..", ".)" };
-
+            //Console.WriteLine("tempString:"+tempString);
             foreach (string s in contains)
             {
                 if (tempString.Contains(s))
@@ -885,7 +913,7 @@ namespace CFPL_Interpreter
                 }
                 else
                 {
-                    Console.WriteLine("here");
+                   // Console.WriteLine("here");
                     if (oprerator.Count != 0 && Predecessor(oprerator.Peek(), inFix[i]))//If find an operator
                     {
                         arrival = oprerator.Pop();
@@ -935,7 +963,7 @@ namespace CFPL_Interpreter
             float num1 = 0, num2 = 0;
 
             string temp = string.Join("", postfix);
-            Console.WriteLine(temp);
+            //Console.WriteLine(temp);
             string[] tokens = temp.Split(' ');
             Stack<float> s2 = new Stack<float>();
 
@@ -972,7 +1000,7 @@ namespace CFPL_Interpreter
                 {
                     //converting string to float
                     s2.Push(float.Parse(token));
-                    Console.WriteLine("peek:" + s2.Peek());
+                    //Console.WriteLine("peek:" + s2.Peek());
                 }
             }
 
@@ -984,6 +1012,10 @@ namespace CFPL_Interpreter
         public string addSpace(string s)
         {
             string spaced= "";
+            if (s.Length == 1)
+            {
+                return s;
+            }
             for (int i = 0; i < s.Length; i++)
             {
                 if (Char.IsNumber(s[i]))
@@ -1126,6 +1158,11 @@ namespace CFPL_Interpreter
             if (x.Equals(">") || x.Equals("<") || x.Equals("g") || x.Equals("l") || x.Equals("e") || x.Equals("n") || x.Equals("a") || x.Equals("o") || x.Equals("!")) return true;
             else return false;
         }
+        private static bool isTorF(string x)
+        {
+            if (x.Equals("f")||x.Equals("t")) return true;
+            else return false;
+        }
         private static bool isOperatorchar(char x)
         {
             if (x.Equals('+') || x.Equals('-') || x.Equals('*') || x.Equals('/') || x.Equals('%')) return true;
@@ -1134,6 +1171,11 @@ namespace CFPL_Interpreter
         private static bool isRelchar(char x)
         {
             if (x.Equals('>') || x.Equals('<') || x.Equals('g') || x.Equals('l') || x.Equals('e') || x.Equals('n') || x.Equals('a') || x.Equals('o') || x.Equals('!')) return true;
+            else return false;
+        }
+        private static bool isParenthesis(string x)
+        {
+            if (x.Equals("(") || x.Equals(")")) return true;
             else return false;
         }
         public float evaluateBoolPostfix()
@@ -1162,16 +1204,18 @@ namespace CFPL_Interpreter
                     if (token[0] != '!')
                     {
                         if (s2.Peek() == "t")
-                            num1 = 1;
-                        else if (s2.Peek() == "f")
-                            num1 = 0;
-                        else num1 = float.Parse(s2.Peek());
-                        s2.Pop();
-                        if (s2.Peek() == "t")
                             num2 = 1;
                         else if (s2.Peek() == "f")
                             num2 = 0;
                         else num2 = float.Parse(s2.Peek());
+                       // Console.WriteLine("num2:" + num2);
+                        s2.Pop();
+                        if (s2.Peek() == "t")
+                            num1 = 1;
+                        else if (s2.Peek() == "f")
+                            num1 = 0;
+                        else num1 = float.Parse(s2.Peek());
+                       // Console.WriteLine("num1:" + num1);
                         s2.Pop();
                     }
                     else
@@ -1193,16 +1237,17 @@ namespace CFPL_Interpreter
                         case '/': this.answer = num2 / num1; break;
                         case '%': this.answer = num2 % num1; break;
                         case '<':
-                            ans = num2 < num1;
-                            if (ans) this.answer = 1;
-                            else this.answer = 0;
-                            break;
-                        case '>':
                             ans = num2 > num1;
                             if (ans) this.answer = 1;
                             else this.answer = 0;
                             break;
+                        case '>':
+                            ans = num1 > num2;
+                            if (ans) this.answer = 1;
+                            else this.answer = 0;
+                            break;
                         case 'g':
+                            //Console.WriteLine(num1 + "_" + num2);
                             ans = num2 <= num1;
                             if (ans) this.answer = 1;
                             else this.answer = 0;
@@ -1256,6 +1301,7 @@ namespace CFPL_Interpreter
                 else if (token.Length != 0 && (Char.IsDigit(token[0]) || token[0] == 't' || token[0] == 'f'))
                 {
                     //converting string to float
+                    //Console.WriteLine("string to float:" + token);
                     s2.Push(token);
 
                 }
@@ -1267,6 +1313,104 @@ namespace CFPL_Interpreter
             return answer;
         }
 
+
+        public void booleanOp(List <string> newstring)
+        {
+            string[] temp = new string[100];
+            for (int i = 0; i < newstring.Count; i++)
+            {
+                //Console.WriteLine("newstring" + newstring[i]);
+                if (newstring[i].Equals("<="))
+                {
+                    temp[i] = "l"; relational = true;
+                }
+                else if (newstring[i].Equals(">="))
+                {
+                    temp[i] = "g"; relational = true;
+                }
+                else if (newstring[i].Equals("<>"))
+                {
+                    temp[i] = "n"; relational = true;
+                }
+                else if (newstring[i].Equals("=="))
+                {
+                    temp[i] = "e"; relational = true;
+                }
+                else if (newstring[i].Equals("AND"))
+                {
+                    temp[i] = "a"; relational = true;
+                }
+                else if (newstring[i].Equals("OR"))
+                {
+                    temp[i] = "o"; relational = true;
+                }
+                else if (newstring[i].Equals("NOT"))
+                {
+                    temp[i] = "!"; relational = true;
+                }
+                else if (newstring[i].Equals("TRUE"))
+                {
+                    temp[i] = "t"; relational = true;
+                }
+                else if (newstring[i].Equals("FALSE"))
+                {
+                    temp[i] = "f"; relational = true;
+                }
+                else
+                    temp[i] = newstring[i].ToString();
+            }
+
+            string newline = string.Join("", temp);
+            newline = addSpace(newline);
+            
+            string[] operand = newline.Split(' ');
+            
+           
+            float a; int b;
+           for (int i = 0; i < operand.Length; i++)
+            {
+                if (map.ContainsKey(operand[i]))
+                   operand[i] = map[operand[i]].ToString();
+                else if (map.ContainsKey(operand[i]))
+                   operand[i] = map[operand[i]].ToString();
+                   else if (!(float.TryParse(operand[i], out a) || int.TryParse(operand[i], out b)) && !isOperator(operand[i]) && !isParenthesis(operand[i]) && !isRel(operand[i]) && !isTorF(operand[i]))
+               {
+                   unknown1 = true;
+                    Console.WriteLine("newline" + newline);
+                    errorMsg.Add("BOOLEAN: Unknown character used.");
+                   break;
+                }
+             }
+           
+             newline = string.Join(" ", operand);
+
+              //  Console.WriteLine(newline);
+
+                //process equation
+                   if (!unknown1)
+                   {
+                        convertToPostfix(newline);
+                        //Console.WriteLine(string.Join("", postfix));
+                        answer = evaluateBoolPostfix();
+                        while_answer = answer;
+                      //  Console.WriteLine(while_answer);
+                        Array.Clear(postfix, 0, postfix.Length);
+                        Array.Clear(temp, 0, temp.Length);
+                   }
+
+            if (relational == true && !unknown1)
+            {
+                //Console.WriteLine("dsada");
+                isboolexp = true;
+            }
+            else
+            {
+                
+                isboolexp = false;
+            }
+
+
+        }
 
 
 

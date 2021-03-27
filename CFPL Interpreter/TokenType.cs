@@ -36,6 +36,6 @@ namespace CFPL_Interpreter
         VAR, AS, OUTPUT, IF, ELSE,
         WHILE, START, STOP, INT,
         BOOL, FLOAT, CHAR,
-        AND, OR, NOT, INPUT
+        AND, OR, NOT, INPUT, TRUE, FALSE
     }
 }
