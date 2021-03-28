@@ -44,7 +44,7 @@ namespace CFPL_Interpreter
         {
             Console.Clear();
             List<string> varList = new List<string>();
-            Dictionary<string, double> declared = new Dictionary<string, double>();
+            Dictionary<string, object> declared = new Dictionary<string, object>();
             object temp;
             string temp_identifier = "";    
             {
@@ -74,9 +74,6 @@ namespace CFPL_Interpreter
 
                                         if (tokens[tCounter].Type == TokenType.INT_LIT)
                                         {
-
-
-
                                             declared.Add(temp_identifier, (int)tokens[tCounter].Literal);
                                             tCounter++;
                                             // Console.WriteLine(temp_identifier +"tempidenitifier");
@@ -84,6 +81,20 @@ namespace CFPL_Interpreter
                                         else if (tokens[tCounter].Type == TokenType.FLOAT_LIT)
                                         {
                                             declared.Add(temp_identifier, (double)tokens[tCounter].Literal);
+                                            tCounter++;
+
+                                            //map[temp_identifier] = temp;
+                                        }
+                                        else if (tokens[tCounter].Type == TokenType.BOOL_LIT)
+                                        {
+                                            declared.Add(temp_identifier, Convert.ToString(tokens[tCounter].Literal));
+                                            tCounter++;
+
+                                            //map[temp_identifier] = temp;
+                                        }
+                                        else if (tokens[tCounter].Type == TokenType.CHAR_LIT)
+                                        {
+                                            declared.Add(temp_identifier, Convert.ToChar(tokens[tCounter].Literal));
                                             tCounter++;
 
                                             //map[temp_identifier] = temp;
@@ -153,6 +164,20 @@ namespace CFPL_Interpreter
                                                 else if (tokens[tCounter].Type == TokenType.FLOAT_LIT)
                                                 {
                                                     declared.Add(temp_identifier, (double)tokens[tCounter].Literal);
+                                                    tCounter++;
+
+                                                    //map[temp_identifier] = temp;
+                                                }
+                                                else if (tokens[tCounter].Type == TokenType.BOOL_LIT)
+                                                {
+                                                    declared.Add(temp_identifier, Convert.ToString(tokens[tCounter].Literal));
+                                                    tCounter++;
+
+                                                    //map[temp_identifier] = temp;
+                                                }
+                                                else if (tokens[tCounter].Type == TokenType.CHAR_LIT)
+                                                {
+                                                    declared.Add(temp_identifier, Convert.ToChar(tokens[tCounter].Literal));
                                                     tCounter++;
 
                                                     //map[temp_identifier] = temp;
@@ -234,6 +259,14 @@ namespace CFPL_Interpreter
                             temp = (double)tokens[tCounter].Literal;
                             tCounter++;
                             break;
+                        case TokenType.BOOL_LIT:
+                            temp = (string)tokens[tCounter].Literal;
+                            tCounter++;
+                            break;
+                        case TokenType.CHAR_LIT:
+                            temp = Convert.ToChar(tokens[tCounter].Literal);
+                            tCounter++;
+                            break;
                         case TokenType.AS:
                             tCounter++;
                             if (tokens[tCounter].Type == TokenType.INT)
@@ -277,6 +310,41 @@ namespace CFPL_Interpreter
                                 varList.Clear();  //varList is a list of variable declaration in one line of code;
                                                   //so after adding them to the hashmap we clear the list to read another line of variable declaration
                             }
+                            else if (tokens[tCounter].Type == TokenType.BOOL)
+                            {
+                                foreach (string a in varList)
+                                {
+                                    if (declared.ContainsKey(a))
+                                    {
+                                        map.Add(a, (string)declared[a]);
+                                    }
+                                    else
+                                    {
+                                        map.Add(a, "FALSE");
+                                    }
+                                }
+                                tCounter++;
+                                varList.Clear();  //varList is a list of variable declaration in one line of code;
+                                                  //so after adding them to the hashmap we clear the list to read another line of variable declaration
+                            }
+                            else if (tokens[tCounter].Type == TokenType.CHAR)
+                            {
+                                //Console.WriteLine("DASDsdfs");
+                                foreach (var a in varList)
+                                {
+                                    if (declared.ContainsKey(a))
+                                    {
+                                        map.Add(a, (char)declared[a]);
+                                    }
+                                    else
+                                    {
+                                        map.Add(a, ' ');
+                                    }
+                                }
+                                tCounter++;
+                                varList.Clear();  //varList is a list of variable declaration in one line of code;
+                                                  //so after adding them to the hashmap we clear the list to read another line of variable declaration
+                            }
                             else
                             {
                                 //error statement
@@ -284,9 +352,10 @@ namespace CFPL_Interpreter
                             break;
                         case TokenType.IDENTIFIER:
                             temp_identifier = tokens[tCounter++].Lexeme;
+                            Console.WriteLine(temp_identifier + "hello");
                             if (tokens[tCounter].Type == TokenType.EQUALS)
                             {
-
+                                Console.WriteLine(temp_identifier + "hi");
                                 tCounter++;
                                 int tCounter2 = tCounter;
                                 String s = "";
@@ -324,18 +393,26 @@ namespace CFPL_Interpreter
                                     }
                                     else
                                     {
-
-
                                         if (tokens[tCounter].Type == TokenType.INT_LIT)
                                         {
                                             temp = (int)tokens[tCounter].Literal;
                                             map[temp_identifier] = temp;
                                             Console.WriteLine("temp"+temp);
-
                                         }
                                         else if (tokens[tCounter].Type == TokenType.FLOAT_LIT)
                                         {
                                             temp = (double)tokens[tCounter].Literal;
+                                            map[temp_identifier] = temp;
+                                        }
+                                        else if (tokens[tCounter].Type == TokenType.BOOL_LIT)
+                                        {
+                                            temp = (string)tokens[tCounter].Literal;
+                                            map[temp_identifier] = temp;
+                                            Console.WriteLine(temp + "wow");
+                                        }
+                                        else if (tokens[tCounter].Type == TokenType.CHAR_LIT)
+                                        {
+                                            temp = Convert.ToChar(tokens[tCounter].Literal);
                                             map[temp_identifier] = temp;
                                         }
                                         //unary add
@@ -454,6 +531,16 @@ namespace CFPL_Interpreter
                                         else if (t == typeof(double))
                                         {
                                             temp = Convert.ToDouble(s);
+                                            map[temp_identifier] = temp;
+                                        }
+                                        else if (t == typeof(string))
+                                        {
+                                            temp = Convert.ToString(s);
+                                            map[temp_identifier] = temp;
+                                        }
+                                        else if (t == typeof(char))
+                                        {
+                                            temp = s.ToCharArray()[0];
                                             map[temp_identifier] = temp;
                                         }
                                     }
