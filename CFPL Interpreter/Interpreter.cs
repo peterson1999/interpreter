@@ -179,7 +179,15 @@ namespace CFPL_Interpreter
                                                 {
                                                     Console.WriteLine(temp_identifier);
                                                     declared.Add(temp_identifier, Convert.ToString(tokens[tCounter].Literal));
-                                                    tCounter+=2;
+
+                                                    tCounter++;
+                                                    if (tokens[tCounter].Type == TokenType.D_QUOTE)
+                                                    {
+                                                        tCounter++;
+                                                    }
+                                                    else
+                                                        errorMsg.Add(string.Format("Missing double quote at line {0}", tokens[tCounter].Line));
+
 
                                                     //map[temp_identifier] = temp;
                                                 }
@@ -563,119 +571,9 @@ namespace CFPL_Interpreter
                             break;
                         case TokenType.OUTPUT:
                             tCounter++;
-                            if (tokens[tCounter].Type == TokenType.COLON)
-                            {
-                                int notIden = 1;
-                                int position = 0;
-                                tCounter++;
-                                while (tokens[tCounter].Type == TokenType.IDENTIFIER || tokens[tCounter].Type == TokenType.D_QUOTE || tokens[tCounter].Type == TokenType.AMPERSAND)
-                                {
-                                    //Console.WriteLine("Lexeme:"+tokens[tCounter].Lexeme);
-                                    if (tokens[tCounter].Type == TokenType.AMPERSAND && position == 0)
-                                    {
-                                        errorMsg.Add("Invalid Concatenation");
-                                        break;
-                                    }
-                                    if (tokens[tCounter].Type == TokenType.IDENTIFIER)
-                                    {
-                                        notIden = 0;
-                                        temp_identifier = tokens[tCounter].Lexeme;
-                                        if (map.ContainsKey(temp_identifier))
-                                        {
-                                            Console.Write(map[temp_identifier]);
-                                        }
-                                        else
-                                        {
-                                            Console.WriteLine("error");
-                                            errorMsg.Add(string.Format("Variable not initialized at line {0}.", tokens[tCounter].Line + 1));
-                                            break;
-                                        }
-                                        tCounter++;
-                                    }
-                                   else if (tokens[tCounter].Type == TokenType.D_QUOTE)
-                                    {
-                                        tCounter++;// move from d_quote to next token
-                                        if (tokens[tCounter].Type == TokenType.SHARP)// if # print newline
-                                        {
-                                            Console.WriteLine();
-                                            tCounter++;
-                                        }
-                                        else if (tokens[tCounter].Type == TokenType.LEFT_BRACE)
-                                        {
-                                            //Console.WriteLine("DSADAS");
-                                            tCounter++;
-                                            if (tokens[tCounter].Type == TokenType.SHARP || tokens[tCounter].Type == TokenType.AMPERSAND || tokens[tCounter].Type == TokenType.LEFT_BRACE || tokens[tCounter].Type == TokenType.RIGHT_BRACE)
-                                            {
-                                                string special = tokens[tCounter].Lexeme;
-                                                if (special[0] == '[')
-                                                {
 
-                                                    if ((tokens[tCounter + 1].Type == TokenType.RIGHT_BRACE && tokens[tCounter + 2].Type == TokenType.RIGHT_BRACE)) {
+                            FuncOutput();
 
-                                                        special += tokens[tCounter + 1].Lexeme;
-                                                        tCounter++;
-                                                    }
-                                                }
-                                                //Console.WriteLine(tokens[tCounter].Lexeme);
-                                                tCounter++;
-                                                if (tokens[tCounter].Type == TokenType.RIGHT_BRACE)
-                                                {
-                                                    tCounter++;
-                                                    if (tokens[tCounter].Type == TokenType.D_QUOTE)
-                                                    {
-                                                        Console.Write(special);
-                                                        tCounter++;
-                                                        position++;
-                                                        continue;
-                                                    }
-                                                    else
-                                                    {
-
-                                                        errorMsg.Add(string.Format("Missing Double Quote at Line {0}.", tokens[tCounter].Line + 1));
-                                                        break;
-                                                    }
-                                                }
-                                                else
-                                                {
-                                                    errorMsg.Add(string.Format("Missing Closing Brace at Line {0}.", tokens[tCounter].Line + 1));
-                                                    break;
-                                                }
-                                            }
-                                            else
-                                            {
-                                                errorMsg.Add(string.Format("Invalid Reserved Word at Line {0}.", tokens[tCounter].Line + 1));
-                                                break;
-                                            }
-                                        }
-                                        else
-                                        {
-                                            Console.Write(tokens[tCounter].Lexeme);
-                                            tCounter++;
-                                        }
-                                        if (tokens[tCounter].Type == TokenType.D_QUOTE)
-                                        {
-                                            //Console.WriteLine("Error:" + tokens[tCounter].Lexeme);
-                                            tCounter++;
-                                        }
-                                        else
-                                        {
-                                            errorMsg.Add(string.Format("Missing Double Quote at Line {0}.", tokens[tCounter].Line + 1));
-                                        }
-                                    }
-                                    else if (tokens[tCounter].Type == TokenType.AMPERSAND)
-                                    {
-                                        tCounter++;
-                                        continue;
-                                    }
-                                   
-                                    position++;
-                                }
-                                //if (notIden == 1)
-                                // {
-                                //     errorMsg.Add(string.Format("Token after INPUT is not a variable name. Error at line {0}.", tokens[tCounter].Line));
-                                //  }
-
-                            }
                             break;
                         case TokenType.IF:
                             List<string> exp1 = new List<string>();
@@ -905,11 +803,123 @@ namespace CFPL_Interpreter
             }
         }
 
+        
+
+        private void FuncOutput()
+        {
+            string temp_identifier = "";
+            tCounter++;
+            tCounter2 = tCounter;
+            if (tokens[tCounter2].Type == TokenType.COLON)
+            {
+                int notIden = 1;
+                tCounter2++;
+                while (tokens[tCounter2].Type == TokenType.IDENTIFIER || tokens[tCounter2].Type == TokenType.D_QUOTE)
+                {
+                    //Console.WriteLine("Lexeme:"+tokens[tCounter].Lexeme);
+                    if (tokens[tCounter2].Type == TokenType.IDENTIFIER)
+                    {
+                        notIden = 0;
+                        temp_identifier = tokens[tCounter2].Lexeme;
+                        if (map.ContainsKey(temp_identifier))
+                        {
+                            Console.Write(map[temp_identifier].ToString());
+                        }
+                        else
+                        {
+                            errorMsg.Add(string.Format("Variable not initialized at line {0}.", tokens[tCounter].Line + 1));
+                            break;
+                        }
+                        tCounter2++;
+                    }
+                    else if (tokens[tCounter2].Type == TokenType.D_QUOTE)
+                    {
+                        tCounter++;// move from d_quote to next token
+                        if (tokens[tCounter2].Type == TokenType.SHARP)// if # print newline
+                        {
+                            Console.WriteLine();
+                            tCounter2++;
+                        }
+                        else if (tokens[tCounter2].Type == TokenType.LEFT_BRACE)
+                        {
+                            //Console.WriteLine("DSADAS");
+                            tCounter2++;
+                            if (tokens[tCounter2].Type == TokenType.SHARP || tokens[tCounter2].Type == TokenType.AMPERSAND || tokens[tCounter2].Type == TokenType.LEFT_BRACE || tokens[tCounter2].Type == TokenType.RIGHT_BRACE)
+                            {
+                                string special = tokens[tCounter2].Lexeme;
+                                if (special[0] == '[')
+                                {
+
+                                    if ((tokens[tCounter2 + 1].Type == TokenType.RIGHT_BRACE && tokens[tCounter2 + 2].Type == TokenType.RIGHT_BRACE))
+                                    {
+
+                                        special += tokens[tCounter2 + 1].Lexeme;
+                                        tCounter2++;
+                                    }
+                                }
+                                //Console.WriteLine(tokens[tCounter].Lexeme);
+                                tCounter++;
+                                if (tokens[tCounter2].Type == TokenType.RIGHT_BRACE)
+                                {
+                                    tCounter++;
+                                    if (tokens[tCounter2].Type == TokenType.D_QUOTE)
+                                    {
+                                        //Console.WriteLine(special);
+                                        tCounter2++;
+                                        continue;
+                                    }
+                                    else
+                                    {
+
+                                        errorMsg.Add(string.Format("Missing Double Quote at Line {0}.", tokens[tCounter2].Line + 1));
+                                        break;
+                                    }
+                                }
+                                else
+                                {
+                                    errorMsg.Add(string.Format("Missing Closing Brace at Line {0}.", tokens[tCounter2].Line + 1));
+                                    break;
+                                }
+                            }
+                            else
+                            {
+                                errorMsg.Add(string.Format("Invalid Reserved Word at Line {0}.", tokens[tCounter2].Line + 1));
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            //Console.Write(tokens[tCounter].Lexeme);//else print token
+                            tCounter2++;
+                        }
+                        if (tokens[tCounter2].Type == TokenType.D_QUOTE)
+                        {
+                            tCounter2++;
+                        }
+                        else
+                        {
+                            errorMsg.Add(string.Format("Missing Double Quote at Line {0}.", tokens[tCounter2].Line + 1));
+                        }
+                    }
+                    else if (tokens[tCounter2].Type == TokenType.AMPERSAND)
+                    {
+                        tCounter2++;
+                        continue;
+                    }
+                }
+                //if (notIden == 1)
+                // {
+                //     errorMsg.Add(string.Format("Token after INPUT is not a variable name. Error at line {0}.", tokens[tCounter].Line));
+                //  }
+
+            }
+        }
+
         private void FuncWhile(int counter)
         {
             string temp_identifier;
             string cond = "";
-            int ctr = counter+1;
+            int ctr = counter + 1;
             int ctr2;
             if (tokens[ctr].Type == TokenType.LEFT_PAREN)
             {
@@ -942,6 +952,7 @@ namespace CFPL_Interpreter
                             switch (tokens[ctr2].Type)
                             {
                                 case TokenType.OUTPUT:
+                                    FuncOutput();
                                     break;
                                 case TokenType.INPUT:
                                     break;
@@ -957,18 +968,18 @@ namespace CFPL_Interpreter
                                     break;
                                 case TokenType.WHILE:
                                     FuncWhile(ctr2);
-                                    tempCounter = ctr = ctr2= tCounter2;
+                                    tempCounter = ctr = ctr2 = tCounter2;
                                     break;
                             }
                             WhileCondition(split);
                         }
-                        
+
                     }
                     ctr = ctr2;
-                    if (tokens[ctr].Type == TokenType.STOP) 
+                    if (tokens[ctr].Type == TokenType.STOP)
                     {
                         whileStopCounter++;
-                        tCounter2 = ctr+1;
+                        tCounter2 = ctr + 1;
                     }
                     /*if(whileStartCounter!=whileStopCounter)
                         errorMsg.Add(string.Format("Error at line {0}. WHILE block has no STOP.", tokens[tCounter].Line + 1));*/
@@ -1016,6 +1027,7 @@ namespace CFPL_Interpreter
                             switch (tokens[tCounter2].Type)
                             {
                                 case TokenType.OUTPUT:
+                                    FuncOutput();
                                     break;
                                 case TokenType.INPUT:
                                     break;
@@ -1031,7 +1043,7 @@ namespace CFPL_Interpreter
                                     break;
                                 case TokenType.WHILE:
                                     FuncWhile(tCounter2);
-                                    tempCounter =tCounter= tCounter2;
+                                    tempCounter = tCounter = tCounter2;
                                     break;
                             }
                             WhileCondition(split);
@@ -1044,7 +1056,7 @@ namespace CFPL_Interpreter
                         whileStopCounter++;
                     }
                     if (whileStartCounter != whileStopCounter)
-                        errorMsg.Add(string.Format("Error at line {0}. WHILE block has no STOP.", tokens[tCounter].Line+1));
+                        errorMsg.Add(string.Format("Error at line {0}. WHILE block has no STOP.", tokens[tCounter].Line + 1));
                 }
             }
             else
@@ -1054,23 +1066,29 @@ namespace CFPL_Interpreter
         }
         private int FuncIdentifier(string temp_identifier, int counter)
         {
-            int currLine = tokens[counter].Line;
+            int currLine = tokens[tCounter].Line;
             object temp;
             if (tokens[counter].Type == TokenType.EQUALS)
             {
                 counter++;
                 int ctr2 = counter;
+                List<string> exp = new List<string>();
                 string s = "";
                 if (map.ContainsKey(temp_identifier))
                 {
-                    //while (tokens[ctr2].Type == TokenType.IDENTIFIER || tokens[ctr2].Type == TokenType.INT_LIT || tokens[ctr2].Type == TokenType.FLOAT_LIT || tokens[ctr2].Type == TokenType.ADD || tokens[ctr2].Type == TokenType.SUBT || tokens[ctr2].Type == TokenType.DIV || tokens[ctr2].Type == TokenType.MULT || tokens[ctr2].Type == TokenType.LEFT_PAREN || tokens[ctr2].Type == TokenType.RIGHT_PAREN)
+                    /*while (tokens[tCounter2].Type == TokenType.IDENTIFIER || tokens[tCounter2].Type == TokenType.INT_LIT || tokens[tCounter2].Type == TokenType.FLOAT_LIT || tokens[tCounter2].Type == TokenType.ADD || tokens[tCounter2].Type == TokenType.SUBT || tokens[tCounter2].Type == TokenType.DIV || tokens[tCounter2].Type == TokenType.MULT || tokens[tCounter2].Type == TokenType.LEFT_PAREN || tokens[tCounter2].Type == TokenType.RIGHT_PAREN || tokens[tCounter2].Type == TokenType.AND
+                       || tokens[tCounter2].Type == TokenType.OR || tokens[tCounter2].Type == TokenType.NOT || tokens[tCounter2].Type == TokenType.LESSER || tokens[tCounter2].Type == TokenType.LESSER_EQUAL ||
+                       tokens[tCounter2].Type == TokenType.GREATER || tokens[tCounter2].Type == TokenType.GREATER_EQUAL || tokens[tCounter2].Type == TokenType.NOT_EQUAL || tokens[tCounter2].Type == TokenType.EQUAL)*/
                     while (tokens[ctr2].Line == currLine)
                     {
                         if (tokens[ctr2].Type == TokenType.IDENTIFIER)
                         {
                             // Console.WriteLine(map[tokens[tCounter2].Lexeme]);
                             if (map.ContainsKey(tokens[ctr2].Lexeme))
+                            {
+                                exp.Add((map[tokens[ctr2].Lexeme].ToString()));
                                 s += map[tokens[ctr2].Lexeme];
+                            }
                             else
                             {
                                 errorMsg.Add(string.Format("Undeclared variable at line {0}.", tokens[ctr2].Line + 1));
@@ -1174,19 +1192,18 @@ namespace CFPL_Interpreter
             if (tokens[tCounter].Type == TokenType.EQUALS)
             {
                 tCounter++;
-
-                int tCounter2 = tCounter;
+                tCounter2 = tCounter;
                 List<string> exp = new List<string>();
-
                 string s = "";
-                Console.WriteLine(temp_identifier);
                 if (map.ContainsKey(temp_identifier))
                 {
 
-                    while (tokens[tCounter2].Type == TokenType.IDENTIFIER || tokens[tCounter2].Type == TokenType.INT_LIT || tokens[tCounter2].Type == TokenType.FLOAT_LIT || tokens[tCounter2].Type == TokenType.ADD || tokens[tCounter2].Type == TokenType.SUBT || tokens[tCounter2].Type == TokenType.DIV || tokens[tCounter2].Type == TokenType.MOD || tokens[tCounter2].Type == TokenType.MULT || tokens[tCounter2].Type == TokenType.LEFT_PAREN || tokens[tCounter2].Type == TokenType.RIGHT_PAREN || tokens[tCounter2].Type == TokenType.AND
-                        || tokens[tCounter2].Type == TokenType.OR || tokens[tCounter2].Type == TokenType.NOT || tokens[tCounter2].Type == TokenType.LESSER || tokens[tCounter2].Type == TokenType.LESSER_EQUAL ||
-                        tokens[tCounter2].Type == TokenType.GREATER || tokens[tCounter2].Type == TokenType.GREATER_EQUAL || tokens[tCounter2].Type == TokenType.NOT_EQUAL || tokens[tCounter2].Type == TokenType.EQUAL)
 
+                    while (tokens[tCounter2].Type == TokenType.IDENTIFIER || tokens[tCounter2].Type == TokenType.INT_LIT || tokens[tCounter2].Type == TokenType.FLOAT_LIT || tokens[tCounter2].Type == TokenType.ADD || tokens[tCounter2].Type == TokenType.SUBT || tokens[tCounter2].Type == TokenType.DIV || tokens[tCounter2].Type == TokenType.MOD || tokens[tCounter2].Type == TokenType.MULT || tokens[tCounter2].Type == TokenType.LEFT_PAREN || tokens[tCounter2].Type == TokenType.RIGHT_PAREN || tokens[tCounter2].Type == TokenType.AND
+
+                        || tokens[tCounter2].Type == TokenType.OR || tokens[tCounter2].Type == TokenType.NOT || tokens[tCounter2].Type == TokenType.LESSER || tokens[tCounter2].Type == TokenType.LESSER_EQUAL ||
+                        tokens[tCounter2].Type == TokenType.GREATER || tokens[tCounter2].Type == TokenType.GREATER_EQUAL || tokens[tCounter2].Type == TokenType.NOT_EQUAL || tokens[tCounter2].Type == TokenType.EQUAL)*/
+                    while (tokens[tCounter2].Line == currLine)
                     {
                         if (tokens[tCounter2].Type == TokenType.IDENTIFIER)
                         {
@@ -1209,6 +1226,7 @@ namespace CFPL_Interpreter
                         }
                         tCounter2++;
                     }
+
                     Console.WriteLine("S:" + s);
                     if (map[temp_identifier].GetType()==typeof(string))
                     {
@@ -1230,10 +1248,11 @@ namespace CFPL_Interpreter
                         }
                     }
                     else if ((IsValid(s)) && (map[temp_identifier].GetType() == typeof(Int32) || map[temp_identifier].GetType() == typeof(double)))
+
                     {
                    
                         string s2 = addSpace(s);
-                         Console.WriteLine("WITH SPACE:" + s2);
+                        // Console.WriteLine("WITH SPACE:" + s2);
                         convertToPostfix(s2);
                         //  Console.WriteLine(string.Join("", postfix));
                         answer = evaluatePostfix();
@@ -1261,6 +1280,7 @@ namespace CFPL_Interpreter
                             temp = (double)tokens[tCounter].Literal;
                             map[temp_identifier] = temp;
                         }
+
                         else if (tokens[tCounter].Type == TokenType.BOOL_LIT && map[temp_identifier].GetType() == typeof(string))
                         {
                             temp = (string)tokens[tCounter].Literal;
@@ -1272,6 +1292,7 @@ namespace CFPL_Interpreter
                             temp = Convert.ToChar(tokens[tCounter].Literal);
                             map[temp_identifier] = temp;
                         }
+
                         //unary add
                         else if (tokens[tCounter].Type == TokenType.ADD)
                         {
