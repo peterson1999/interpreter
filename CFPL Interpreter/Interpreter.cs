@@ -179,6 +179,12 @@ namespace CFPL_Interpreter
                                                 {
                                                     declared.Add(temp_identifier, Convert.ToString(tokens[tCounter].Literal));
                                                     tCounter++;
+                                                    if (tokens[tCounter].Type == TokenType.D_QUOTE)
+                                                    {
+                                                        tCounter++;
+                                                    }
+                                                    else
+                                                        errorMsg.Add(string.Format("Missing double quote at line {0}", tokens[tCounter].Line));
 
                                                     //map[temp_identifier] = temp;
                                                 }
