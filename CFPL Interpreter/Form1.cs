@@ -101,9 +101,9 @@ namespace CFPL_Interpreter
             interpreter = new Interpreter(scanner.Tokens);
             errorInterpreter = interpreter.Parse();
             dict = interpreter.Map;
-            InterErrorHandler();
             if (errorInterpreter == 0)
             {
+                richTextBox2.Text = "Parsing Complete!";
                 foreach (KeyValuePair<string, object> a in dict)
                 {
                     Console.WriteLine(string.Format("var name:{0}, var value: {1}", a.Key, a.Value));
@@ -112,6 +112,7 @@ namespace CFPL_Interpreter
                
             else
             {
+                richTextBox2.Text = "";
                 foreach (string a in interpreter.ErrorMsg)
                 {
                     richTextBox2.Text += a + "\n";
@@ -120,7 +121,7 @@ namespace CFPL_Interpreter
             
         }
 
-        private void InterErrorHandler()
+        /*private void InterErrorHandler()
         {
             if (errorInterpreter == 0)
             {
@@ -164,7 +165,7 @@ namespace CFPL_Interpreter
             {
                 richTextBox2.Text += "Syntax error.\n";
             }
-        }
+        }*/
 
         private void richTextBox2_TextChanged(object sender, EventArgs e)
         {
@@ -191,6 +192,7 @@ namespace CFPL_Interpreter
                 button2.Enabled = true;
             else
             {
+                richTextBox2.Text = "";
                 foreach (string a in scanner.ErrorMsg)
                 {
                     richTextBox2.Text += a + "\n";
