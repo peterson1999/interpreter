@@ -152,7 +152,7 @@ namespace CFPL_Interpreter
                         char_counter++;
                         break;
                     case '"':
-                        if (isBool(NextChar()))
+                        if ((NextChar()=='F' || NextChar()=='T'))
                         {
                             char_counter++;
                             char b = currString[char_counter];
