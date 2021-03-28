@@ -152,8 +152,19 @@ namespace CFPL_Interpreter
                         char_counter++;
                         break;
                     case '"':
-                        tokens.Add(new Tokens(TokenType.D_QUOTE, a.ToString(), null, line));
-                        char_counter++;
+                        if (isBool(NextChar()))
+                        {
+                            char_counter++;
+                            char b = currString[char_counter];
+                            //Console.WriteLine("b"+b);
+                            BoolVal(b);
+                        }
+                        else
+                        {
+                            tokens.Add(new Tokens(TokenType.D_QUOTE, a.ToString(), null, line));
+                            char_counter++;
+                        }
+                        
                         break;
                     case '#':
                         tokens.Add(new Tokens(TokenType.SHARP, a.ToString(), null, line));
@@ -179,6 +190,12 @@ namespace CFPL_Interpreter
                             isIdentifier(a);
                             break;
                         }
+                        else if (isChar(a))
+                        {
+                            //Console.WriteLine("isBOOLCHAR: " + a +" result:"+isBoolChar(a));
+                            CharVal(a);
+                            break;
+                        }
                         else
                         {
                             errorMsg.Add(string.Format("Encountered unsupported character \"{0}\" at line {1}.\n", a, line + 1));
@@ -187,6 +204,106 @@ namespace CFPL_Interpreter
                         }
                 }
             }
+        }
+
+        private void BoolVal(char a)
+        {
+            int charCount = 0;
+            var t = TokenType.BOOL_LIT;
+            string temp = "";
+            string temp2 = "";
+            //Console.WriteLine("Char:" + a);
+            while (isBool(a))
+            {
+                if (a == ' ')
+                {
+                    a = NextChar();
+                    char_counter++;
+                }
+                else
+                {
+                    temp += a;
+                    a = NextChar();
+                    char_counter++;
+                   // Console.WriteLine("temp:" + temp);
+                }
+                //charCount++;
+            }
+            
+            //if (charCount - 2 == 1)
+            //{
+             //   t = TokenType.CHAR_LIT;
+              //  tokens.Add(new Tokens(t, temp2, char.Parse(temp2), line));
+           // }
+           
+                if (temp == "TRUE")
+                {
+                    tokens.Add(new Tokens(t, temp, Convert.ToString("TRUE"), line));
+                }
+                else if (temp == "FALSE")
+                {
+                    tokens.Add(new Tokens(t, temp, Convert.ToString("FALSE"), line));
+                }
+                else
+                {
+                    errorMsg.Add(string.Format("Invalid value at line {0}.", line + 1));
+                }
+            
+
+        }
+        private void CharVal(char a)
+        {
+            int charCount = 0;
+            var t = TokenType.BOOL_LIT;
+            string temp = "";
+            string temp2 = "";
+            
+            while (isChar(a))
+            {
+                if (charCount == 1)
+                {
+                    temp2 += a;
+                    //Console.WriteLine("temp2:"+temp2);
+                }
+                temp += a;
+                a = NextChar();
+                char_counter++;
+                charCount++;
+            }
+            //Console.WriteLine("temp:"+temp);
+            if (charCount - 2 == 1)
+            {
+                t = TokenType.CHAR_LIT;
+                tokens.Add(new Tokens(t, temp2, char.Parse(temp2), line));
+            }
+            else
+            {
+                if (temp == "\'TRUE\'" || temp == "\' TRUE \'" || temp == "\'TRUE \'" || temp == "\' TRUE\'")
+                {
+                    tokens.Add(new Tokens(t, temp, Convert.ToString("TRUE"), line));
+                }
+                else if (temp == "\'FALSE\'" || temp == "\' FALSE \'" || temp == "\'FALSE \'" || temp == " \'FALSE\'")
+                {
+                    tokens.Add(new Tokens(t, temp, Convert.ToString("FALSE"), line));
+                }
+                else
+                {
+                    errorMsg.Add(string.Format("Invalid value at line {0}.", line + 1));
+                }
+            }
+
+        }
+
+        private bool isChar(char a)
+        {
+            
+            return (a == '\'' || (a >= 'a' && a <= 'z') || (a >= 'A' && a <= 'Z') || a == '_' || (a >= '0' && a <= '9'));
+        }
+
+        private bool isBool(char a)
+        {
+
+            return ((a >= 'A' && a <= 'Z'));
         }
 
         private void isValue(char a)    //checks whether a digit is a float or integer
@@ -260,6 +377,12 @@ namespace CFPL_Interpreter
                         tokens.Add(new Tokens(TokenType.CHAR, temp, null, line));
                     else
                         errorMsg.Add(string.Format("Invalid usage of a reserved word CHAR at line {0}.", line));
+                    break;
+                case "BOOL":
+                    if (tokens[tokens.Count - 1].Type == TokenType.AS)
+                        tokens.Add(new Tokens(TokenType.BOOL, temp, null, line));
+                    else
+                        errorMsg.Add(string.Format("Invalid usage of a reserved word BOOL at line {0}.", line));
                     break;
                 case "INPUT":
                     tokens.Add(new Tokens(TokenType.INPUT, temp, null, line));
