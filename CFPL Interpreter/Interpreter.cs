@@ -24,7 +24,7 @@ namespace CFPL_Interpreter
         float answer = 0, while_answer=0;
         private static int tCounter, tCounter2, whileStartCounter, whileStopCounter;
 
-        char[] postfix = new char[100];
+        string[] postfix = new string[100];
         private static Dictionary<string, object> map;
         private static List<string> errorMsg;
 
@@ -1005,6 +1005,7 @@ namespace CFPL_Interpreter
                     cond += tokens[tCounter2].Lexeme + " ";
                     tCounter2++;
                 }
+                Console.WriteLine("cond: "+cond);
                 tCounter2++;
                 tCounter = tCounter2;
                 string[] split = cond.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
@@ -1199,10 +1200,10 @@ namespace CFPL_Interpreter
                 {
 
 
-                    while (tokens[tCounter2].Type == TokenType.IDENTIFIER || tokens[tCounter2].Type == TokenType.INT_LIT || tokens[tCounter2].Type == TokenType.FLOAT_LIT || tokens[tCounter2].Type == TokenType.ADD || tokens[tCounter2].Type == TokenType.SUBT || tokens[tCounter2].Type == TokenType.DIV || tokens[tCounter2].Type == TokenType.MOD || tokens[tCounter2].Type == TokenType.MULT || tokens[tCounter2].Type == TokenType.LEFT_PAREN || tokens[tCounter2].Type == TokenType.RIGHT_PAREN || tokens[tCounter2].Type == TokenType.AND
+                    //while (tokens[tCounter2].Type == TokenType.IDENTIFIER || tokens[tCounter2].Type == TokenType.INT_LIT || tokens[tCounter2].Type == TokenType.FLOAT_LIT || tokens[tCounter2].Type == TokenType.ADD || tokens[tCounter2].Type == TokenType.SUBT || tokens[tCounter2].Type == TokenType.DIV || tokens[tCounter2].Type == TokenType.MOD || tokens[tCounter2].Type == TokenType.MULT || tokens[tCounter2].Type == TokenType.LEFT_PAREN || tokens[tCounter2].Type == TokenType.RIGHT_PAREN || tokens[tCounter2].Type == TokenType.AND
 
-                        || tokens[tCounter2].Type == TokenType.OR || tokens[tCounter2].Type == TokenType.NOT || tokens[tCounter2].Type == TokenType.LESSER || tokens[tCounter2].Type == TokenType.LESSER_EQUAL ||
-                        tokens[tCounter2].Type == TokenType.GREATER || tokens[tCounter2].Type == TokenType.GREATER_EQUAL || tokens[tCounter2].Type == TokenType.NOT_EQUAL || tokens[tCounter2].Type == TokenType.EQUAL)*/
+                   //     || tokens[tCounter2].Type == TokenType.OR || tokens[tCounter2].Type == TokenType.NOT || tokens[tCounter2].Type == TokenType.LESSER || tokens[tCounter2].Type == TokenType.LESSER_EQUAL ||
+                  //      tokens[tCounter2].Type == TokenType.GREATER || tokens[tCounter2].Type == TokenType.GREATER_EQUAL || tokens[tCounter2].Type == TokenType.NOT_EQUAL || tokens[tCounter2].Type == TokenType.EQUAL)
                     while (tokens[tCounter2].Line == currLine)
                     {
                         if (tokens[tCounter2].Type == TokenType.IDENTIFIER)
@@ -1231,7 +1232,7 @@ namespace CFPL_Interpreter
                     if (map[temp_identifier].GetType()==typeof(string))
                     {
                         
-                        booleanOp(exp);
+                       booleanOp(exp);
                     }
                     if (isboolexp == true)
                     {
@@ -1243,16 +1244,16 @@ namespace CFPL_Interpreter
                         }
                         else
                         {
-                            temp = "FALSE";
+                           temp = "FALSE";
                             map[temp_identifier] = temp;
                         }
                     }
-                    else if ((IsValid(s)) && (map[temp_identifier].GetType() == typeof(Int32) || map[temp_identifier].GetType() == typeof(double)))
+                    else if ((IsValid(s)))
 
                     {
                    
                         string s2 = addSpace(s);
-                        // Console.WriteLine("WITH SPACE:" + s2);
+                         Console.WriteLine("WITH SPACE:" + s2);
                         convertToPostfix(s2);
                         //  Console.WriteLine(string.Join("", postfix));
                         answer = evaluatePostfix();
@@ -1307,6 +1308,17 @@ namespace CFPL_Interpreter
                                 temp = (double)tokens[tCounter].Literal * 1;
                                 map[temp_identifier] = temp;
                             }
+
+                            else if (tokens[tCounter].Type == TokenType.IDENTIFIER && map[tokens[tCounter].Lexeme].GetType()==typeof(Int32) && map[temp_identifier].GetType() == typeof(Int32))
+                            {
+                                temp = (int)map[tokens[tCounter].Lexeme] * 1;
+                                map[temp_identifier] = temp;
+                            }
+                            else if (tokens[tCounter].Type == TokenType.IDENTIFIER && map[tokens[tCounter].Lexeme].GetType() == typeof(double) && map[temp_identifier].GetType() == typeof(double))
+                            {
+                                temp = (double)map[tokens[tCounter].Lexeme] * 1;
+                                map[temp_identifier] = temp;
+                            }
                         }
                         else if (tokens[tCounter].Type == TokenType.SUBT)
                         {   
@@ -1319,6 +1331,16 @@ namespace CFPL_Interpreter
                             else if (tokens[tCounter].Type == TokenType.FLOAT_LIT && map[temp_identifier].GetType() == typeof(double))
                             {
                                 temp = (double)tokens[tCounter].Literal * -1;
+                                map[temp_identifier] = temp;
+                            }
+                            else if (tokens[tCounter].Type == TokenType.IDENTIFIER && map[tokens[tCounter].Lexeme].GetType() == typeof(Int32) && map[temp_identifier].GetType() == typeof(Int32))
+                            {
+                                temp = (int)map[tokens[tCounter].Lexeme] * -1;
+                                map[temp_identifier] = temp;
+                            }
+                            else if (tokens[tCounter].Type == TokenType.IDENTIFIER && map[tokens[tCounter].Lexeme].GetType() == typeof(double) && map[temp_identifier].GetType() == typeof(double))
+                            {
+                                temp = (double)map[tokens[tCounter].Lexeme] * -1;
                                 map[temp_identifier] = temp;
                             }
                         }
@@ -1375,7 +1397,7 @@ namespace CFPL_Interpreter
                     stringList.Add(cond);
                 }
             }
-            convertToPostfix(cond);
+            //convertToPostfix(cond);
             booleanOp(stringList);
         }
 
@@ -1397,6 +1419,7 @@ namespace CFPL_Interpreter
         public static bool IsValid(string input)
         {
             //bool boolexprflag;
+            int flag = 0;
             Regex operators = new Regex(@"[\-+*/%<>==!>=<=]", RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
             if (isboolexp == true)
             {
@@ -1446,8 +1469,31 @@ namespace CFPL_Interpreter
             {
                 if (tempString.Contains(s))
                 {
-                    Console.WriteLine("error4");
-                    return false;
+                    if (tempString.Contains(".."))
+                    {
+                        for (int i = 0; i < input.Length; i++)
+                        {
+                            if (isOperator(Convert.ToString(input[i])))
+                            {
+                                if (isOperator(Convert.ToString(input[i + 1])))
+                                {
+                                    if (Char.IsNumber(input[i + 2]) && (input[i + 1]=='+' || input[i + 1] == '-'))
+                                    {
+                                        flag = 1;
+                                    }
+                                    else
+                                    {
+                                        flag = 0;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    if (flag == 0)
+                    {
+                        Console.WriteLine("error4");
+                        return false;
+                    }
                 }
             }
             operators = new Regex(@"[().]", RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
@@ -1521,6 +1567,7 @@ namespace CFPL_Interpreter
                     while (i < inFix.Length && (Char.IsNumber(inFix[i]) || inFix[i] == '.'))
                     {
 
+
                         postFix.Append(inFix[i]);
                         i++;
                     }
@@ -1592,12 +1639,13 @@ namespace CFPL_Interpreter
             float num1 = 0, num2 = 0;
 
             string temp = string.Join("", postfix);
-            //Console.WriteLine(temp);
+            Console.WriteLine("temp:"+temp);
             string[] tokens = temp.Split(' ');
             Stack<float> s2 = new Stack<float>();
 
             foreach (string token in tokens)
             {
+                //Console.WriteLine("Token:"+token);
                 if (token.Length != 0 && isOperator(token[0].ToString()))
                 {
                     if (token[0] == '-' || token[0] == '+')
@@ -1629,7 +1677,7 @@ namespace CFPL_Interpreter
                 {
                     //converting string to float
                     s2.Push(float.Parse(token));
-                    //Console.WriteLine("peek:" + s2.Peek());
+                    Console.WriteLine("peek:" + s2.Peek());
                 }
             }
 
@@ -1663,7 +1711,15 @@ namespace CFPL_Interpreter
 
                 else if (isOperatorchar(s[i]) || isRelchar(s[i]) || isTorF(s[i].ToString())|| s[i] == '(' || s[i] == ')')
                 {
-                    spaced += s[i];
+                    if ((s[i] == '-' || s[i] == '+') && Char.IsNumber(s[i + 1]) && !Char.IsNumber(s[i - 1]))
+                    {
+                        spaced += s[i];
+                        spaced += s[i + 1];
+                        i++;
+                    }
+                    else {
+                        spaced += s[i];
+                    }
                     // Console.WriteLine("string added" + s[i]);
 
                 }
@@ -1691,10 +1747,10 @@ namespace CFPL_Interpreter
             {
                 //if digit, add it immediately to the array
                 if (Char.IsDigit(temp[i]) || temp[i] == '.' || temp[i] == 't' || temp[i] == 'f')
-                    postfix[j++] = temp[i];
+                    postfix[j++] = temp[i].ToString();
 
-                else if (temp[i] == ' ' && j > 0 && postfix[j - 1] != ' ')
-                    postfix[j++] = temp[i];
+                else if (temp[i] == ' ' && j > 0 && postfix[j - 1] != " ")
+                    postfix[j++] = temp[i].ToString();
 
                 //if token is an operator:
                 else if (isOperator(temp[i].ToString()) || isRel(temp[i].ToString()))
@@ -1703,8 +1759,9 @@ namespace CFPL_Interpreter
                     {
                         if (Char.IsDigit(temp[i + 1]))
                         {
-                            postfix[j++] = temp[i];
-                            postfix[j++] = temp[i + 1];
+                            
+                            postfix[j++] = temp[i].ToString();
+                            postfix[j++] = temp[i + 1].ToString();
                             i++;
                             continue;
                         }
@@ -1717,9 +1774,9 @@ namespace CFPL_Interpreter
                         //check precedence of the current operator & operator inside the stack
                         while (!IsEmpty(s) && checkPrecedence(s.Peek().ToString()) >= checkPrecedence(temp[i].ToString()))
                         {
-                            postfix[j++] = s.Peek();
+                            postfix[j++] = s.Peek().ToString();
                             s.Pop();
-                            postfix[j++] = ' ';
+                            postfix[j++] = " ";
                         }
                         s.Push(temp[i]);
                     }
@@ -1736,9 +1793,9 @@ namespace CFPL_Interpreter
                 {
                     while (!IsEmpty(s) && s.Peek() != '(')
                     {
-                        postfix[j++] = s.Peek();
+                        postfix[j++] = s.Peek().ToString();
                         s.Pop();
-                        postfix[j++] = ' ';
+                        postfix[j++] = " ";
                     }
                     //pop '('
                     s.Pop();
@@ -1748,11 +1805,11 @@ namespace CFPL_Interpreter
             //get remaining operators in the stack
             while (!IsEmpty(s))
             {
-                postfix[j++] = ' ';
-                postfix[j++] = s.Peek();
+                postfix[j++] = " ";
+                postfix[j++] = s.Peek().ToString();
                 s.Pop();
             }
-            postfix[j++] = '\0';
+            postfix[j++] = "\0";
         }
         public static int checkPrecedence(string sym)
         {
@@ -2060,7 +2117,7 @@ namespace CFPL_Interpreter
                         //Console.WriteLine("pf: "+string.Join("", postfix));
                         answer = evaluateBoolPostfix();
                         while_answer = answer;
-                      //  Console.WriteLine(while_answer);
+                       Console.WriteLine(while_answer);
                         Array.Clear(postfix, 0, postfix.Length);
                         Array.Clear(temp, 0, temp.Length);
                    }
