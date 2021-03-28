@@ -20,8 +20,10 @@ namespace CFPL_Interpreter
                 (?> (?: (\s)* (-|\+|\*|/|%|>|<|(<>)|(==)|(>=)|(<=)|AND|OR|NOT) (\s)* (?> (?<p> \( )* (?>(-|\+)? (\s)* (\d+(?:\.\d+)?|[a-zA-Z_$][a-zA-Z_$0-9]*|(""TRUE""|""FALSE""))) (\s)* (?<-p> \) )* ))+) (?(p)(?!))$");
         Regex booloperator = new Regex(@"(?x)^(\s)*([a-zA-Z_$][a-zA-Z_$0-9]*(\s)*(=)(\s)*)( (NOT)* (-|\+)? (\s)* [a-zA-Z_$][a-zA-Z_$0-9]*(\s)*(=)(\s)*)* (NOT)* (?> (-|\+)? (\s)* (?<p> \( )* (?>(-|\+)? (\s)* (\d+(?:\.\d+)?|[a-zA-Z_$][a-zA-Z_$0-9]*|(""TRUE""|""FALSE""))) (?<-p> \) )* )
                 (?> (?: (\s)* (-|\+|\*|/|%|>|<|(<>)|(==)|(>=)|(<=)|AND|OR|NOT) (\s)* (?> (?<p> \( )* (?>(-|\+)? (\s)* (\d+(?:\.\d+)?|[a-zA-Z_$][a-zA-Z_$0-9]*|(""TRUE""|""FALSE""))) (\s)* (?<-p> \) )* ))+) (?(p)(?!))$");
-        float answer = 0, while_answer = 0;
-        private static int tCounter, tCounter2;
+
+        float answer = 0, while_answer=0;
+        private static int tCounter, tCounter2, whileStartCounter, whileStopCounter;
+
         char[] postfix = new char[100];
         private static Dictionary<string, object> map;
         private static List<string> errorMsg;
@@ -34,7 +36,7 @@ namespace CFPL_Interpreter
             tokens = new List<Tokens>(t);
             errorMsg = new List<string>();
             map = new Dictionary<string, object>();
-            tCounter = tCounter2 = 0;
+            tCounter = tCounter2 = whileStartCounter= whileStopCounter=0;
             hasStart = hasStop = false;
             //AllocConsole();
         }
@@ -780,74 +782,10 @@ namespace CFPL_Interpreter
 
                             break;
                         case TokenType.WHILE:
-                            string cond = "";
-                            int startCount = 0, stopCount = 0;
-                            tCounter++;
-                            if (tokens[tCounter].Type == TokenType.LEFT_PAREN)
-                            {
-                                tCounter++;
-                                int tCounter2 = tCounter;
-                                while (tokens[tCounter2].Type != TokenType.RIGHT_PAREN)
-                                {
-                                    cond += tokens[tCounter2].Lexeme + " ";
-                                    tCounter2++;
-                                }
-                                tCounter2++;
-                                tCounter = tCounter2;
-                                string[] split = cond.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                                WhileCondition(split);
-                                if (tokens[tCounter].Type != TokenType.START)
-                                {
-                                    errorMsg.Add(string.Format("Error at line {0}. WHILE block has no START.", tokens[tCounter].Line));
-                                }
-                                else
-                                {
-                                    startCount++;
-                                    tCounter++;
-                                    int tempCounter = tCounter;
-                                    tCounter2 = tCounter;
-                                    while (answer == 0 ? false : true) //performing the while block
-                                    {
-                                        Console.WriteLine(answer);
-                                        tCounter2 = tCounter = tempCounter;
-                                        switch (tokens[tCounter2].Type)
-                                        {
-                                            case TokenType.OUTPUT:
-                                                break;
-                                            case TokenType.INPUT:
-                                                break;
-                                            case TokenType.IDENTIFIER:
-                                                temp_identifier = tokens[tCounter++].Lexeme;
-                                                FuncIdentifier(temp_identifier);
-                                                tCounter2 = tCounter;
-                                                break;
-                                            case TokenType.IF:
-                                                break;
-                                            case TokenType.ELIF:
-                                                break;
-                                            case TokenType.ELSE:
-                                                break;
-                                            /* case TokenType.STOP:
-                                                 tCounter2= tempCounter;
-                                                 break;*/
-                                            case TokenType.WHILE:
-                                                break;
-                                        }
-                                        tCounter2++;
-                                        WhileCondition(split);
-                                    }
-                                    tCounter2--;
-                                    tCounter = tCounter2;
-                                    if (tokens[tCounter].Type == TokenType.STOP)
-                                        startCount--;
-                                    if (startCount != stopCount)
-                                        errorMsg.Add(string.Format("Error at line {0}. WHILE block has no STOP.", tokens[tCounter].Line));
-                                }
-                            }
-                            else
-                            {
-                                errorMsg.Add(string.Format("{0}", tokens[tCounter].Lexeme));
-                            }
+
+
+                            FuncWhile();
+
                             break;
                         default:
                             tCounter++;
@@ -856,47 +794,294 @@ namespace CFPL_Interpreter
                     temp_identifier = "";
                     temp = null;
                 }
-                /*if (error != 0)
-                {
-                    return error;
-                }
-                else if (hasStart == true && hasStop == true)
-                {
-                    return 0;
-                }
-                else if (hasStart == false)
-                {
-                    return 13;
-                }
-                else if (hasStart == true && hasStop == false)
-                {
-                    return 14;
-                }
-                else if (hasStart == false && hasStop == false)
-                {
-                    return -13;
-                }
-                else
-                    return 0; //no problem*/
+                if (!hasStop)
+                    errorMsg.Add("Program execution failed. It has no STOP");
                 return errorMsg.Count;
             }
         }
 
+        private void FuncWhile(int counter)
+        {
+            string temp_identifier;
+            string cond = "";
+            int ctr = counter+1;
+            int ctr2;
+            if (tokens[ctr].Type == TokenType.LEFT_PAREN)
+            {
+                ctr++;
+                ctr2 = ctr;
+                while (tokens[ctr2].Type != TokenType.RIGHT_PAREN)
+                {
+                    cond += tokens[ctr2].Lexeme + " ";
+                    ctr2++;
+                }
+                ctr2++;
+                ctr = ctr2;
+                string[] split = cond.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                WhileCondition(split);
+                if (tokens[ctr].Type != TokenType.START)
+                {
+                    errorMsg.Add(string.Format("Error at line {0}. WHILE block has no START.", tokens[tCounter].Line));
+                }
+                else
+                {
+                    whileStartCounter++;
+                    ctr++;
+                    int tempCounter = ctr;
+                    ctr2 = ctr;
+                    while (answer == 0 ? false : true) //performing the while block
+                    {
+                        ctr2 = ctr = tempCounter;
+                        while (tokens[ctr2].Type != TokenType.STOP)
+                        {
+                            switch (tokens[ctr2].Type)
+                            {
+                                case TokenType.OUTPUT:
+                                    break;
+                                case TokenType.INPUT:
+                                    break;
+                                case TokenType.IDENTIFIER:
+                                    temp_identifier = tokens[ctr++].Lexeme;
+                                    ctr2 = FuncIdentifier(temp_identifier, ctr);
+                                    break;
+                                case TokenType.IF:
+                                    break;
+                                case TokenType.ELIF:
+                                    break;
+                                case TokenType.ELSE:
+                                    break;
+                                case TokenType.WHILE:
+                                    FuncWhile(ctr2);
+                                    tempCounter = ctr = ctr2= tCounter2;
+                                    break;
+                            }
+                            WhileCondition(split);
+                        }
+                        
+                    }
+                    ctr = ctr2;
+                    if (tokens[ctr].Type == TokenType.STOP) 
+                    {
+                        whileStopCounter++;
+                        tCounter2 = ctr+1;
+                    }
+                    /*if(whileStartCounter!=whileStopCounter)
+                        errorMsg.Add(string.Format("Error at line {0}. WHILE block has no STOP.", tokens[tCounter].Line + 1));*/
+                }
+            }
+            else
+            {
+                errorMsg.Add(string.Format("{0}", tokens[ctr].Lexeme));
+            }
+        }
+
+        private void FuncWhile()
+        {
+            string temp_identifier;
+            string cond = "";
+            tCounter++;
+            if (tokens[tCounter].Type == TokenType.LEFT_PAREN)
+            {
+                tCounter++;
+                tCounter2 = tCounter;
+                while (tokens[tCounter2].Type != TokenType.RIGHT_PAREN)
+                {
+                    cond += tokens[tCounter2].Lexeme + " ";
+                    tCounter2++;
+                }
+                tCounter2++;
+                tCounter = tCounter2;
+                string[] split = cond.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                WhileCondition(split);
+                if (tokens[tCounter].Type != TokenType.START)
+                {
+                    errorMsg.Add(string.Format("Error at line {0}. WHILE block has no START.", tokens[tCounter].Line));
+                }
+                else
+                {
+                    whileStartCounter++;
+                    tCounter++;
+                    int tempCounter = tCounter;
+                    tCounter2 = tCounter;
+                    while (answer == 0 ? false : true) //performing the while block
+                    {
+                        tCounter2 = tCounter = tempCounter;
+                        while (tokens[tCounter2].Type != TokenType.STOP)
+                        {
+                            switch (tokens[tCounter2].Type)
+                            {
+                                case TokenType.OUTPUT:
+                                    break;
+                                case TokenType.INPUT:
+                                    break;
+                                case TokenType.IDENTIFIER:
+                                    temp_identifier = tokens[tCounter++].Lexeme;
+                                    FuncIdentifier(temp_identifier);
+                                    break;
+                                case TokenType.IF:
+                                    break;
+                                case TokenType.ELIF:
+                                    break;
+                                case TokenType.ELSE:
+                                    break;
+                                case TokenType.WHILE:
+                                    FuncWhile(tCounter2);
+                                    tempCounter =tCounter= tCounter2;
+                                    break;
+                            }
+                            WhileCondition(split);
+                        }
+                    }
+                    tCounter = tCounter2;
+                    if (tokens[tCounter].Type == TokenType.STOP)
+                    {
+                        tCounter++;
+                        whileStopCounter++;
+                    }
+                    if (whileStartCounter != whileStopCounter)
+                        errorMsg.Add(string.Format("Error at line {0}. WHILE block has no STOP.", tokens[tCounter].Line+1));
+                }
+            }
+            else
+            {
+                errorMsg.Add(string.Format("{0}", tokens[tCounter].Lexeme));
+            }
+        }
+        private int FuncIdentifier(string temp_identifier, int counter)
+        {
+            int currLine = tokens[counter].Line;
+            object temp;
+            if (tokens[counter].Type == TokenType.EQUALS)
+            {
+                counter++;
+                int ctr2 = counter;
+                string s = "";
+                if (map.ContainsKey(temp_identifier))
+                {
+                    //while (tokens[ctr2].Type == TokenType.IDENTIFIER || tokens[ctr2].Type == TokenType.INT_LIT || tokens[ctr2].Type == TokenType.FLOAT_LIT || tokens[ctr2].Type == TokenType.ADD || tokens[ctr2].Type == TokenType.SUBT || tokens[ctr2].Type == TokenType.DIV || tokens[ctr2].Type == TokenType.MULT || tokens[ctr2].Type == TokenType.LEFT_PAREN || tokens[ctr2].Type == TokenType.RIGHT_PAREN)
+                    while (tokens[ctr2].Line == currLine)
+                    {
+                        if (tokens[ctr2].Type == TokenType.IDENTIFIER)
+                        {
+                            // Console.WriteLine(map[tokens[tCounter2].Lexeme]);
+                            if (map.ContainsKey(tokens[ctr2].Lexeme))
+                                s += map[tokens[ctr2].Lexeme];
+                            else
+                            {
+                                errorMsg.Add(string.Format("Undeclared variable at line {0}.", tokens[ctr2].Line + 1));
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            s += tokens[ctr2].Lexeme;
+                        }
+                        ctr2++;
+                    }
+                    if (IsValid(s))
+                    {
+                        string s2 = addSpace(s);
+                        // Console.WriteLine("WITH SPACE:" + s2);
+                        convertToPostfix(s2);
+                        //  Console.WriteLine(string.Join("", postfix));
+                        answer = evaluatePostfix();
+                        //Console.WriteLine("answer:"+answer);
+
+                        temp = answer;
+                        map[temp_identifier] = temp;
+                        counter = ctr2;
+
+                    }
+                    else
+                    {
+                        if (tokens[counter].Type == TokenType.INT_LIT)
+                        {
+                            temp = (int)tokens[counter].Literal;
+                            map[temp_identifier] = temp;
+                            //Console.WriteLine("temp"+temp);
+
+                        }
+                        else if (tokens[counter].Type == TokenType.FLOAT_LIT)
+                        {
+                            temp = (double)tokens[counter].Literal;
+                            map[temp_identifier] = temp;
+                        }
+                        //unary add
+                        else if (tokens[counter].Type == TokenType.ADD)
+                        {
+                            tCounter++;
+                            if (tokens[counter].Type == TokenType.INT_LIT)
+                            {
+                                temp = (int)tokens[counter].Literal * 1;
+                                map[temp_identifier] = temp;
+                            }
+                            else if (tokens[counter].Type == TokenType.FLOAT_LIT)
+                            {
+                                temp = (double)tokens[counter].Literal * 1;
+                                map[temp_identifier] = temp;
+                            }
+                        }
+                        else if (tokens[counter].Type == TokenType.SUBT)
+                        {
+                            tCounter++;
+                            if (tokens[counter].Type == TokenType.INT_LIT)
+                            {
+                                temp = (int)tokens[counter].Literal * -1;
+                                map[temp_identifier] = temp;
+                            }
+                            else if (tokens[counter].Type == TokenType.FLOAT_LIT)
+                            {
+                                temp = (double)tokens[counter].Literal * -1;
+                                map[temp_identifier] = temp;
+                            }
+                        }
+                        else if (tokens[counter].Type == TokenType.IDENTIFIER)
+                        {
+                            temp = map[tokens[counter].Lexeme];
+                            map[temp_identifier] = temp;
+
+                        }
+
+                        else
+                        {
+                            errorMsg.Add(string.Format("Identifier does not exist at line {0}.", tokens[counter].Line + 1));
+                            //error = 21; //Identifier does not exist;
+                            //error statement
+                            //identifier does not exist meaning variable not initialized
+                        }
+
+
+                    }
+                }
+
+                else
+                {
+                    errorMsg.Add(string.Format("Syntax error. Are you trying to do a variable assignation at line {0}?", tokens[counter].Line + 1));
+                    //error = -2;//next token is not = meaning unused identifier
+                }
+            }
+            return counter;
+        }
         private void FuncIdentifier(string temp_identifier)
         {
+            int currLine = tokens[tCounter].Line;
             object temp;
             if (tokens[tCounter].Type == TokenType.EQUALS)
             {
                 tCounter++;
+
                 int tCounter2 = tCounter;
                 List<string> exp = new List<string>();
+
                 string s = "";
                 Console.WriteLine(temp_identifier);
                 if (map.ContainsKey(temp_identifier))
                 {
+
                     while (tokens[tCounter2].Type == TokenType.IDENTIFIER || tokens[tCounter2].Type == TokenType.INT_LIT || tokens[tCounter2].Type == TokenType.FLOAT_LIT || tokens[tCounter2].Type == TokenType.ADD || tokens[tCounter2].Type == TokenType.SUBT || tokens[tCounter2].Type == TokenType.DIV || tokens[tCounter2].Type == TokenType.MULT || tokens[tCounter2].Type == TokenType.LEFT_PAREN || tokens[tCounter2].Type == TokenType.RIGHT_PAREN || tokens[tCounter2].Type == TokenType.AND
                         || tokens[tCounter2].Type == TokenType.OR || tokens[tCounter2].Type == TokenType.NOT || tokens[tCounter2].Type == TokenType.LESSER || tokens[tCounter2].Type == TokenType.LESSER_EQUAL ||
                         tokens[tCounter2].Type == TokenType.GREATER || tokens[tCounter2].Type == TokenType.GREATER_EQUAL || tokens[tCounter2].Type == TokenType.NOT_EQUAL || tokens[tCounter2].Type == TokenType.EQUAL)
+
                     {
                         if (tokens[tCounter2].Type == TokenType.IDENTIFIER)
                         {
