@@ -288,6 +288,9 @@ namespace CFPL_Interpreter
                 case "TRUE":
                     tokens.Add(new Tokens(TokenType.TRUE, temp, null, line));
                     break;
+                case "WHILE":
+                    tokens.Add(new Tokens(TokenType.WHILE, temp, null, line));
+                    break;
                 case "FALSE":
                     tokens.Add(new Tokens(TokenType.FALSE, temp, null, line));
                     break;
