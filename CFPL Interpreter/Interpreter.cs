@@ -14,7 +14,7 @@ namespace CFPL_Interpreter
         private static bool hasStart;
         private static bool isboolexp = false;
         private static int nested = 0;
-        bool unknown1 = false, relational = false;
+        bool unknown1 = false, relational = false, whileRelational=false;
         int flagif = -1, ifcount = 0, startcount = 0, stopcount = 0;
         private static Regex boolxpression = new Regex(@"(?x)^(\s)*IF (\s)*( (NOT)* (-|\+)? (\s)* [a-zA-Z_$][a-zA-Z_$0-9]*(\s)*(=)(\s)*)* (NOT)* (?> (-|\+)? (\s)* (?<p> \( )* (?>(-|\+)? (\s)* (\d+(?:\.\d+)?|[a-zA-Z_$][a-zA-Z_$0-9]*|(""TRUE""|""FALSE""))) (?<-p> \) )* )
                 (?> (?: (\s)* (-|\+|\*|/|%|>|<|(<>)|(==)|(>=)|(<=)|AND|OR|NOT) (\s)* (?> (?<p> \( )* (?>(-|\+)? (\s)* (\d+(?:\.\d+)?|[a-zA-Z_$][a-zA-Z_$0-9]*|(""TRUE""|""FALSE""))) (\s)* (?<-p> \) )* ))+) (?(p)(?!))$");
@@ -93,7 +93,7 @@ namespace CFPL_Interpreter
                                             }
                                             else
                                             {
-                                                ErrorMsg.Add("Invalid Boolean Declaration: Missing Double Quote");
+                                                errorMsg.Add("Invalid Boolean Declaration: Missing Double Quote");
                                             }
 
                                             //map[temp_identifier] = temp;
@@ -785,10 +785,7 @@ namespace CFPL_Interpreter
 
                             break;
                         case TokenType.WHILE:
-
-
                             FuncWhile();
-
                             break;
                         default:
                             tCounter++;
@@ -934,6 +931,7 @@ namespace CFPL_Interpreter
                 ctr = ctr2;
                 string[] split = cond.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
                 WhileCondition(split);
+                whileRelational = true;
                 if (tokens[ctr].Type != TokenType.START)
                 {
                     errorMsg.Add(string.Format("Error at line {0}. WHILE block has no START.", tokens[tCounter].Line));
@@ -1010,6 +1008,7 @@ namespace CFPL_Interpreter
                 tCounter = tCounter2;
                 string[] split = cond.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
                 WhileCondition(split);
+                whileRelational = true;
                 if (tokens[tCounter].Type != TokenType.START)
                 {
                     errorMsg.Add(string.Format("Error at line {0}. WHILE block has no START.", tokens[tCounter].Line));
@@ -1067,7 +1066,7 @@ namespace CFPL_Interpreter
         }
         private int FuncIdentifier(string temp_identifier, int counter)
         {
-            int currLine = tokens[tCounter].Line;
+            int currLine = tokens[counter].Line;
             object temp;
             if (tokens[counter].Type == TokenType.EQUALS)
             {
@@ -1102,7 +1101,27 @@ namespace CFPL_Interpreter
                         }
                         ctr2++;
                     }
-                    if (IsValid(s))
+                    Console.WriteLine("S:" + s);
+                    if (map[temp_identifier].GetType() == typeof(string))
+                    {
+
+                        booleanOp(exp);
+                    }
+                    if (isboolexp == true && whileRelational == false)
+                    {
+                        Console.WriteLine("isbooleanexp: " + s);
+                        if (while_answer == 1)
+                        {
+                            temp = "TRUE";
+                            map[temp_identifier] = temp;
+                        }
+                        else
+                        {
+                            temp = "FALSE";
+                            map[temp_identifier] = temp;
+                        }
+                    }
+                    else if (IsValid(s))
                     {
                         string s2 = addSpace(s);
                         // Console.WriteLine("WITH SPACE:" + s2);
@@ -1198,10 +1217,7 @@ namespace CFPL_Interpreter
                 string s = "";
                 if (map.ContainsKey(temp_identifier))
                 {
-
-
                     //while (tokens[tCounter2].Type == TokenType.IDENTIFIER || tokens[tCounter2].Type == TokenType.INT_LIT || tokens[tCounter2].Type == TokenType.FLOAT_LIT || tokens[tCounter2].Type == TokenType.ADD || tokens[tCounter2].Type == TokenType.SUBT || tokens[tCounter2].Type == TokenType.DIV || tokens[tCounter2].Type == TokenType.MOD || tokens[tCounter2].Type == TokenType.MULT || tokens[tCounter2].Type == TokenType.LEFT_PAREN || tokens[tCounter2].Type == TokenType.RIGHT_PAREN || tokens[tCounter2].Type == TokenType.AND
-
                    //     || tokens[tCounter2].Type == TokenType.OR || tokens[tCounter2].Type == TokenType.NOT || tokens[tCounter2].Type == TokenType.LESSER || tokens[tCounter2].Type == TokenType.LESSER_EQUAL ||
                   //      tokens[tCounter2].Type == TokenType.GREATER || tokens[tCounter2].Type == TokenType.GREATER_EQUAL || tokens[tCounter2].Type == TokenType.NOT_EQUAL || tokens[tCounter2].Type == TokenType.EQUAL)
                     while (tokens[tCounter2].Line == currLine)
@@ -1222,21 +1238,18 @@ namespace CFPL_Interpreter
                         }
                         else
                         {
-                            exp.Add(tokens[tCounter2].Lexeme.ToString());
                             s += tokens[tCounter2].Lexeme;
                         }
                         tCounter2++;
                     }
-
                     Console.WriteLine("S:" + s);
-                    if (map[temp_identifier].GetType()==typeof(string))
-                    {
-                        
+                    if (map[temp_identifier].GetType() == typeof(string))
+                    {                       
                        booleanOp(exp);
                     }
-                    if (isboolexp == true)
+                    if (isboolexp == true && whileRelational ==false)
                     {
-                        Console.WriteLine("isbooleanexp: "+s);
+                        Console.WriteLine("isbooleanexp: " + s);
                         if (while_answer == 1)
                         {
                             temp = "TRUE";
@@ -1249,11 +1262,10 @@ namespace CFPL_Interpreter
                         }
                     }
                     else if ((IsValid(s)))
-
                     {
                    
                         string s2 = addSpace(s);
-                         Console.WriteLine("WITH SPACE:" + s2);
+                        //Console.WriteLine("WITH SPACE:" + s2);
                         convertToPostfix(s2);
                         //  Console.WriteLine(string.Join("", postfix));
                         answer = evaluatePostfix();
@@ -1261,6 +1273,7 @@ namespace CFPL_Interpreter
 
                         temp = answer;
                         map[temp_identifier] = temp;
+
                         tCounter = tCounter2;
 
                     }
@@ -2112,7 +2125,7 @@ namespace CFPL_Interpreter
 
             //process equation
             if (!unknown1)
-                   {
+            {
                         convertToPostfix(newline);
                         //Console.WriteLine("pf: "+string.Join("", postfix));
                         answer = evaluateBoolPostfix();
@@ -2120,7 +2133,7 @@ namespace CFPL_Interpreter
                        Console.WriteLine(while_answer);
                         Array.Clear(postfix, 0, postfix.Length);
                         Array.Clear(temp, 0, temp.Length);
-                   }
+            }
 
             if (relational == true && !unknown1)
             {
