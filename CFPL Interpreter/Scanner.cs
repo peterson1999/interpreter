@@ -366,6 +366,12 @@ namespace CFPL_Interpreter
                     else
                         errorMsg.Add(string.Format("Invalid usage of a reserved word FLOAT at line {0}.", line));
                     break;
+                case "BOOL":
+                    if (tokens[tokens.Count - 1].Type == TokenType.AS)
+                        tokens.Add(new Tokens(TokenType.BOOL, temp, null, line));
+                    else
+                        errorMsg.Add(string.Format("Invalid usage of a reserved word BOOL at line {0}.", line));
+                    break;
                 case "VAR":
                     tokens.Add(new Tokens(TokenType.VAR, temp, null, line));
                     break;

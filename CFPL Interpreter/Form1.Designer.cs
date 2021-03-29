@@ -103,7 +103,7 @@
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(176, 23);
             this.button2.TabIndex = 3;
-            this.button2.Text = "SCALE";
+            this.button2.Text = "SCAN";
             this.button2.UseVisualStyleBackColor = false;
             this.button2.Click += new System.EventHandler(this.button2_Click_1);
             // 
@@ -141,7 +141,6 @@
             this.fastColoredTextBox1.CharWidth = 8;
             this.fastColoredTextBox1.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.fastColoredTextBox1.DisabledColor = System.Drawing.Color.FromArgb(((int)(((byte)(100)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))), ((int)(((byte)(180)))));
-            this.fastColoredTextBox1.Font = new System.Drawing.Font("Courier New", 9.75F);
             this.fastColoredTextBox1.IsReplaceMode = false;
             this.fastColoredTextBox1.Location = new System.Drawing.Point(12, 27);
             this.fastColoredTextBox1.Name = "fastColoredTextBox1";

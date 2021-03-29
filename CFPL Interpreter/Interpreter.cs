@@ -64,11 +64,38 @@ namespace CFPL_Interpreter
                                     varList.Add(tokens[tCounter].Lexeme);
                                     tCounter++;
 
+<<<<<<< Updated upstream
                                     if (tokens[tCounter].Type == TokenType.EQUALS)
+=======
+
+                                    if (tokens[tCounter].Type == TokenType.INT_LIT)
+                                    {
+                                        declared.Add(temp_identifier, (int)tokens[tCounter].Literal);
+                                        tCounter++;
+                                        // Console.WriteLine(temp_identifier +"tempidenitifier");
+                                    }
+                                    else if (tokens[tCounter].Type == TokenType.FLOAT_LIT)
+>>>>>>> Stashed changes
                                     {
                                         temp_identifier = tokens[tCounter - 1].Lexeme;
                                         tCounter++;
 
+<<<<<<< Updated upstream
+=======
+                                        //map[temp_identifier] = temp;
+                                    }
+                                    else if (tokens[tCounter].Type == TokenType.BOOL_LIT)
+                                    {
+                                        declared.Add(temp_identifier, Convert.ToBoolean((string)tokens[tCounter].Literal));
+                                        tCounter++;
+
+                                        //map[temp_identifier] = temp;
+                                    }
+                                    //unary add
+                                    else if (tokens[tCounter].Type == TokenType.ADD)
+                                    {
+                                        tCounter++;
+>>>>>>> Stashed changes
                                         if (tokens[tCounter].Type == TokenType.INT_LIT)
                                         {
                                             declared.Add(temp_identifier, (int)tokens[tCounter].Literal);
@@ -138,6 +165,7 @@ namespace CFPL_Interpreter
                                                 tCounter++;
                                                 //map[temp_identifier] = temp;
                                             }
+<<<<<<< Updated upstream
                                         }
 
                                         else
@@ -157,6 +185,17 @@ namespace CFPL_Interpreter
                                             tCounter++;
                                             //Console.WriteLine(tokens[tCounter].Lexeme);
                                             if (tokens[tCounter].Type == TokenType.EQUALS)
+=======
+                                            else if (tokens[tCounter].Type == TokenType.BOOL_LIT)
+                                            {
+                                                declared.Add(temp_identifier, Convert.ToBoolean((string)tokens[tCounter].Literal));
+                                                tCounter++;
+
+                                                //map[temp_identifier] = temp;
+                                            }
+                                            //unary add
+                                            else if (tokens[tCounter].Type == TokenType.ADD)
+>>>>>>> Stashed changes
                                             {
 
                                                 temp_identifier = tokens[tCounter - 1].Lexeme;
@@ -240,6 +279,41 @@ namespace CFPL_Interpreter
                                                 }
                                             }
 
+<<<<<<< Updated upstream
+=======
+                                }
+                            }
+                            else
+                            {
+                                errorMsg.Add(string.Format("Invalid variable declaration. Token after VAR is not an Identifier at line {0}.", tokens[tCounter].Line));
+                                //error = -3; //Invalid variable declaration token after VAR is not an Identifier.
+                            }
+                        }
+                        else
+                        {
+                            errorMsg.Add(string.Format("Invalid variable declaration. Declaration after START at line {0}.", tokens[tCounter].Line));
+                            //error = -4; //variable declaration after start
+                        }
+                        break;
+                    case TokenType.INT_LIT:
+                        temp = (int)tokens[tCounter].Literal;
+                        tCounter++;
+                        break;
+                    case TokenType.FLOAT_LIT:
+                        temp = (double)tokens[tCounter].Literal;
+                        tCounter++;
+                        break;
+                    case TokenType.BOOL_LIT:
+                        temp = Convert.ToBoolean(tokens[tCounter].Literal);
+                        tCounter++;
+                        break;
+                    case TokenType.AS:
+                        tCounter++;
+                        if (tokens[tCounter].Type == TokenType.INT)
+                        {
+                            foreach (string a in varList)
+                            {
+>>>>>>> Stashed changes
 
                                         }
                                         else
@@ -274,9 +348,44 @@ namespace CFPL_Interpreter
                         case TokenType.INT_LIT:
                             temp = (int)tokens[tCounter].Literal;
                             tCounter++;
+<<<<<<< Updated upstream
                             break;
                         case TokenType.FLOAT_LIT:
                             temp = (double)tokens[tCounter].Literal;
+=======
+                            varList.Clear();  //varList is a list of variable declaration in one line of code;
+                                              //so after adding them to the hashmap we clear the list to read another line of variable declaration
+                        }
+                        else if (tokens[tCounter].Type == TokenType.BOOL)
+                        {
+                            //Console.WriteLine("DASDsdfs");
+                            foreach (string a in varList)
+                            {
+                                if (declared.ContainsKey(a))
+                                {
+                                    // Console.WriteLine(declared[a]);
+                                    map.Add(a, Convert.ToBoolean(declared[a].ToString()));
+                                }
+                                else
+                                {
+                                    map.Add(a, false);
+                                }
+                            }
+                            tCounter++;
+                            varList.Clear();  //varList is a list of variable declaration in one line of code;
+                        }
+                        else
+                        {
+                            //error statement
+                        }
+                        break;
+                    case TokenType.IDENTIFIER:
+                        temp_identifier = tokens[tCounter++].Lexeme;
+
+                        if (tokens[tCounter].Type == TokenType.EQUALS)
+                        {
+
+>>>>>>> Stashed changes
                             tCounter++;
                             break;
                         case TokenType.BOOL_LIT:
@@ -388,6 +497,11 @@ namespace CFPL_Interpreter
                                     else
                                     {
                                         map.Add(a, ' ');
+                                    }
+                                    else if (t == typeof(bool))
+                                    {
+                                        temp = Convert.ToBoolean(s);
+                                        map[temp_identifier] = temp;
                                     }
                                 }
                                 tCounter++;
