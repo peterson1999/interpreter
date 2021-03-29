@@ -595,7 +595,7 @@ namespace CFPL_Interpreter
 
                                     if (while_answer == 1) // wala pa man logical so ge hardcode lang sa nako
                                     {
-                                        Console.WriteLine("IF Success Line:" + tokens[tCounter].Line);
+                                     //   Console.WriteLine("IF Success Line:" + tokens[tCounter].Line);
                                         ifcount++;
                                         flagif = 1;
                                         tCounter++;
@@ -613,20 +613,20 @@ namespace CFPL_Interpreter
                                             {
 
                                                 nested--;
-                                                Console.WriteLine("stopnested:" + nested + "Line:" + tokens[tCounter].Line + 1);
+                                              //  Console.WriteLine("stopnested:" + nested + "Line:" + tokens[tCounter].Line + 1);
                                             }
                                             else if (tokens[tCounter].Type == TokenType.IF || tokens[tCounter].Type == TokenType.ELSE || tokens[tCounter].Type == TokenType.ELIF)
                                             {
 
                                                 nested++;
-                                                Console.WriteLine("startnested:" + nested + "Line:" + tokens[tCounter].Line + 1);
+                                               // Console.WriteLine("startnested:" + nested + "Line:" + tokens[tCounter].Line + 1);
                                             }
 
                                             tCounter++;
 
                                         }
 
-                                        Console.WriteLine("started nested:" + nested + " next:" + tokens[tCounter].Lexeme + "Line:" + tokens[tCounter].Line + 1);
+                                       // Console.WriteLine("started nested:" + nested + " next:" + tokens[tCounter].Lexeme + "Line:" + tokens[tCounter].Line + 1);
                                         // tCounter++;
                                     }
                                 }
@@ -680,7 +680,7 @@ namespace CFPL_Interpreter
 
                                     if (while_answer == 1 && flagif == 0) // wala pa man logical so ge hardcode lang sa nako
                                     {
-                                        Console.WriteLine("ELIF Success Line:" + tokens[tCounter].Line + 1);
+                                      //  Console.WriteLine("ELIF Success Line:" + tokens[tCounter].Line + 1);
                                         ifcount++;
                                         flagif = 1;
                                         tCounter++;
@@ -689,7 +689,7 @@ namespace CFPL_Interpreter
                                     else   //if "if statement" is false
                                     {
                                         //flagif = 0;
-                                        Console.WriteLine("ELIF fail");
+                                     //   Console.WriteLine("ELIF fail");
                                         nested++;
                                         //  Console.WriteLine("start nested:" + nested);
                                         while (nested != 0)   //checks for nests and looks for stops (basically skips everything)
@@ -699,13 +699,13 @@ namespace CFPL_Interpreter
                                             {
 
                                                 nested--;
-                                                Console.WriteLine("stopnested:" + nested + "Line:" + tokens[tCounter].Line + 1);
+                                            //    Console.WriteLine("stopnested:" + nested + "Line:" + tokens[tCounter].Line + 1);
                                             }
 
                                             else if (tokens[tCounter].Type == TokenType.IF || tokens[tCounter].Type == TokenType.ELSE || tokens[tCounter].Type == TokenType.ELIF)
                                             {
                                                 nested++;
-                                                Console.WriteLine("startnested:" + nested + "Line:" + tokens[tCounter].Line + 1);
+                                          //      Console.WriteLine("startnested:" + nested + "Line:" + tokens[tCounter].Line + 1);
                                             }
 
                                             tCounter++;
@@ -730,7 +730,7 @@ namespace CFPL_Interpreter
                             if (flagif == 0) //if "if statement" is false
                             {
                                 //startcount--;
-                                Console.WriteLine("ELSE Success Line:" + tokens[tCounter].Line + 1);
+                             //   Console.WriteLine("ELSE Success Line:" + tokens[tCounter].Line + 1);
                                 ifcount++;
                                 flagif = 1;
                                 //   Console.WriteLine("SUCCESS");
@@ -750,14 +750,14 @@ namespace CFPL_Interpreter
                                     {
 
                                         nested--;
-                                        Console.WriteLine("stopnested:" + nested + "Line:" + tokens[tCounter].Line + 1);
+                                    //    Console.WriteLine("stopnested:" + nested + "Line:" + tokens[tCounter].Line + 1);
                                         //      Console.WriteLine("seen stop:else nested:" + nested + "Line:" + tokens[tCounter].Line);
                                     }
 
                                     else if (tokens[tCounter].Type == TokenType.IF || tokens[tCounter].Type == TokenType.ELSE || tokens[tCounter].Type == TokenType.ELIF)
                                     {
                                         nested++;
-                                        Console.WriteLine("startnested:" + nested + "Line:" + tokens[tCounter].Line + 1);
+                                       // Console.WriteLine("startnested:" + nested + "Line:" + tokens[tCounter].Line + 1);
                                         //       Console.WriteLine("seen if/else else nested:" + nested + "Line:" + tokens[tCounter].Line);
                                     }
 
@@ -901,7 +901,7 @@ namespace CFPL_Interpreter
                             }
                             else
                             {
-                                Console.Write("LEXEME" + tokens[tCounter2].Lexeme);
+                               // Console.Write("LEXEME" + tokens[tCounter2].Lexeme);
                                 errorMsg.Add(string.Format("Missing Double Quote at Line {0}.", tokens[tCounter2].Line + 1));
                             }
                         }
@@ -1015,7 +1015,7 @@ namespace CFPL_Interpreter
                     cond += tokens[tCounter2].Lexeme + " ";
                     tCounter2++;
                 }
-                Console.WriteLine("cond: "+cond);
+               // Console.WriteLine("cond: "+cond);
                 tCounter2++;
                 tCounter = tCounter2;
                 string[] split = cond.Split(new char[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
@@ -1113,7 +1113,7 @@ namespace CFPL_Interpreter
                         }
                         ctr2++;
                     }
-                    Console.WriteLine("S:" + s);
+//Console.WriteLine("S:" + s);
                     if (map[temp_identifier].GetType() == typeof(string))
                     {
 
@@ -1121,7 +1121,7 @@ namespace CFPL_Interpreter
                     }
                     if (isboolexp == true && whileRelational == false)
                     {
-                        Console.WriteLine("isbooleanexp: " + s);
+                   //     Console.WriteLine("isbooleanexp: " + s);
                         if (while_answer == 1)
                         {
                             temp = "TRUE";
@@ -1234,7 +1234,7 @@ namespace CFPL_Interpreter
                   //      tokens[tCounter2].Type == TokenType.GREATER || tokens[tCounter2].Type == TokenType.GREATER_EQUAL || tokens[tCounter2].Type == TokenType.NOT_EQUAL || tokens[tCounter2].Type == TokenType.EQUAL)
                     while (tokens[tCounter2].Line == currLine)
                     {
-                        Console.WriteLine("INSIDE");
+                     //   Console.WriteLine("INSIDE");
                         if (tokens[tCounter2].Type == TokenType.IDENTIFIER)
                         {
                             // Console.WriteLine(map[tokens[tCounter2].Lexeme]);
@@ -1255,14 +1255,14 @@ namespace CFPL_Interpreter
                         }
                         tCounter2++;
                     }
-                    Console.WriteLine("S:" + s);
+               //     Console.WriteLine("S:" + s);
                     if (map[temp_identifier].GetType() == typeof(string))
                     {                       
                        booleanOp(exp);
                     }
                     if (isboolexp == true && whileRelational == false)
                     {
-                        Console.WriteLine("isbooleanexp: " + s);
+                    //    Console.WriteLine("isbooleanexp: " + s);
                         if (while_answer == 1)
                         {
                             temp = "TRUE";
@@ -1296,7 +1296,7 @@ namespace CFPL_Interpreter
                         if (tokens[tCounter].Type == TokenType.INT_LIT && map[temp_identifier].GetType() == typeof(Int32))
                         {
                             
-                            Console.WriteLine("Error here");
+                          //  Console.WriteLine("Error here");
                             temp = (int)tokens[tCounter].Literal;
                             map[temp_identifier] = temp;
                             //Console.WriteLine("temp"+temp);
@@ -1372,7 +1372,7 @@ namespace CFPL_Interpreter
                         }
                         else if (tokens[tCounter].Type == TokenType.IDENTIFIER)
                         {
-                            Console.WriteLine("SUD");
+                         //   Console.WriteLine("SUD");
                             if (map[tokens[tCounter].Lexeme].GetType() == map[temp_identifier].GetType())
                             {
                                 temp = map[tokens[tCounter].Lexeme];
@@ -1482,7 +1482,7 @@ namespace CFPL_Interpreter
             }
 
             string tempString = operators.Replace(input, ".");
-            Console.WriteLine("NEW:" + tempString);
+         //   Console.WriteLine("NEW:" + tempString);
             if (tempString.EndsWith("."))
             {
                 errorMsg.Add("Operator at end");
@@ -1527,7 +1527,7 @@ namespace CFPL_Interpreter
             }
             operators = new Regex(@"[().]", RegexOptions.IgnorePatternWhitespace | RegexOptions.Compiled);
             tempString = operators.Replace(tempString, string.Empty);
-            Console.WriteLine("tempString= " + tempString);
+           // Console.WriteLine("tempString= " + tempString);
             foreach (char c in tempString.ToCharArray())
             {
                 if (!Char.IsNumber(c))
@@ -1557,7 +1557,7 @@ namespace CFPL_Interpreter
             if (input.StartsWith("*") || input.StartsWith("/") || input.StartsWith("%")
                                                       || input.StartsWith("+") || input.StartsWith("-"))
             {
-                Console.WriteLine("error8");
+                errorMsg.Add("Invalid Syntax:8");
                 return false;
             }
             contains = new string[] { "(%", "(/", "(*", "(+", "(-" };
@@ -1668,7 +1668,7 @@ namespace CFPL_Interpreter
             float num1 = 0, num2 = 0;
 
             string temp = string.Join("", postfix);
-            Console.WriteLine("temp:"+temp);
+           // Console.WriteLine("temp:"+temp);
             string[] tokens = temp.Split(' ');
             Stack<float> s2 = new Stack<float>();
 
@@ -1706,7 +1706,7 @@ namespace CFPL_Interpreter
                 {
                     //converting string to float
                     s2.Push(float.Parse(token));
-                    Console.WriteLine("peek:" + s2.Peek());
+                   // Console.WriteLine("peek:" + s2.Peek());
                 }
             }
 
@@ -1761,7 +1761,7 @@ namespace CFPL_Interpreter
                     spaced += ' ';
                 }
             }
-            Console.WriteLine(spaced);
+           // Console.WriteLine(spaced);
 
             return spaced;
         }
@@ -1911,7 +1911,7 @@ namespace CFPL_Interpreter
                 {
                     if (token[0] == 't')
                     {
-                        Console.WriteLine("inside");
+//Console.WriteLine("inside");
                         answer = 1;
                         break;
                     }
@@ -2060,7 +2060,7 @@ namespace CFPL_Interpreter
            // Console.WriteLine("DASDA");
             for (int i = 0; i < newstring.Count; i++)
             {
-                Console.WriteLine("newstring" + newstring[i]);
+              //  Console.WriteLine("newstring" + newstring[i]);
                 if (newstring[i].Equals("<="))
                 {
                     temp[i] = "l"; relational = true;
@@ -2112,7 +2112,7 @@ namespace CFPL_Interpreter
             }
 
             string newline = string.Join("", temp);
-            Console.WriteLine("newline1" + newline);
+        //    Console.WriteLine("newline1" + newline);
             newline = addSpace(newline);
            
             string[] operand = newline.Split(' ');
@@ -2128,7 +2128,7 @@ namespace CFPL_Interpreter
                    else if (!(float.TryParse(operand[i], out a) || int.TryParse(operand[i], out b)) && !isOperator(operand[i]) && !isParenthesis(operand[i]) && !isRel(operand[i]) && !isTorF(operand[i]))
                {
                    unknown1 = true;
-                    Console.WriteLine("newline" + newline);
+                 //   Console.WriteLine("newline" + newline);
 
                     errorMsg.Add("BOOLEAN: Unknown character used: "+operand[i]);
                    break;
@@ -2161,7 +2161,7 @@ namespace CFPL_Interpreter
                 
                 isboolexp = false;
             }
-            Console.WriteLine(isboolexp);
+           // Console.WriteLine(isboolexp);
 
 
         }
