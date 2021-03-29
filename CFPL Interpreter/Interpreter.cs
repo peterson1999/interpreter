@@ -55,7 +55,7 @@ namespace CFPL_Interpreter
                     switch (tokens[tCounter].Type)
                     {
                         case TokenType.VAR:
-                            //Console.WriteLine("Dsadas");
+                          //Console.WriteLine(tokens[tCounter+1].Lexeme);
                             if (!hasStart)
                             {
                                 tCounter++;
@@ -264,7 +264,10 @@ namespace CFPL_Interpreter
                             }
                             else
                             {
+                                //Console.WriteLine("ERROR");
                                 errorMsg.Add(string.Format("Invalid variable declaration. Declaration after START at line {0}.", tokens[tCounter].Line + 1));
+                                tCounter++;
+                                break;
                                 //error = -4; //variable declaration after start
                             }
                             break;
@@ -439,133 +442,109 @@ namespace CFPL_Interpreter
                             break;
                         case TokenType.INPUT:
 
+
                             tCounter++;
-                            int counter = 0;
+                            List<String> input_variables = new List<string>();
                             if (tokens[tCounter].Type == TokenType.COLON)
                             {
-                                int notIden = 1;
                                 tCounter++;
                                 if (tokens[tCounter].Type == TokenType.IDENTIFIER)
                                 {
-                                    notIden = 0;
-                                    temp_identifier = tokens[tCounter].Lexeme;
-                                    if (map.ContainsKey(temp_identifier))
-                                    {
-                                        string s = Console.ReadLine();
 
-                                        Type t = map[temp_identifier].GetType();
-                                        //Console.WriteLine(t.ToString());
-                                        if (t == typeof(Int32))
-                                        {
-                                            temp = Convert.ToInt32(s);
-                                            map[temp_identifier] = temp;
-                                        }
-                                        else if (t == typeof(double))
-                                        {
-                                            temp = Convert.ToDouble(s);
-                                            map[temp_identifier] = temp;
-                                        }
-                                        else if (t == typeof(string))
-                                        {
-                                            temp = Convert.ToString(s);
-                                            map[temp_identifier] = temp;
-                                        }
-                                        else if (t == typeof(char))
-                                        {
-                                            temp = s.ToCharArray()[0];
-                                            map[temp_identifier] = temp;
-                                        }
+                                    if (map.ContainsKey(tokens[tCounter].Lexeme))
+                                    {
+                                        input_variables.Add(tokens[tCounter].Lexeme);
+                                        tCounter++;
                                     }
                                     else
                                     {
                                         errorMsg.Add(string.Format("Variable not initialized at line {0}.", tokens[tCounter].Line + 1));
-                                        //error = -6; //Variable not initialized
-                                        break;
                                     }
-                                    tCounter++;
+
                                     if (tokens[tCounter].Type == TokenType.COMMA)
                                     {
-                                        tCounter++;
-                                        continue;
-                                    }
-                                    else if (tokens[tCounter].Type == TokenType.IDENTIFIER)
-                                    {
-                                        errorMsg.Add(string.Format("Syntax error. Multiple inputs need a comma in between at line {0}.", tokens[tCounter].Line + 1));
-                                        //error = -8; //Syntax error put comma after a variable to have more than 1 INPUTS
-                                        break;
-                                    }
-                                    else
-                                    {
-                                        break;
-                                    }
-                                }
-
-                                while(tokens[tCounter].Type == TokenType.COMMA)
-                                {
-                                    tCounter++;
-                                    if (tokens[tCounter].Type == TokenType.IDENTIFIER)
-                                    {
-                                        notIden = 0;
-                                        temp_identifier = tokens[tCounter].Lexeme;
-                                        if (map.ContainsKey(temp_identifier))
+                                        while (tokens[tCounter].Type == TokenType.COMMA)
                                         {
-                                            string s = Console.ReadLine();
-                                            Type t = map[temp_identifier].GetType();
-                                            //Console.WriteLine(t.ToString());
+                                            tCounter++;
+                                            if (tokens[tCounter].Type == TokenType.IDENTIFIER)
+                                            {
+
+                                                if (map.ContainsKey(tokens[tCounter].Lexeme))
+                                                {
+                                                    input_variables.Add(tokens[tCounter].Lexeme);
+                                                    tCounter++;
+                                                }
+                                                else
+                                                {
+                                                    errorMsg.Add(string.Format("Variable not initialized at line {0}.", tokens[tCounter].Line + 1));
+                                                }
+                                            }
+                                        }
+                                    }
+                                    //else
+                                    //{
+                                     //   errorMsg.Add(string.Format("Syntax error. Multiple inputs need a comma in between at line {0}.", tokens[tCounter].Line + 1));
+                                    //}
+                                    String s = Console.ReadLine();
+                                    String[] input_values = s.Split(',');
+
+                                    int i = 0;
+                                    if (input_variables.Count == input_values.Length)
+                                    {
+                                        //Console.WriteLine("pota");
+                                        int counter = 0;
+                                        foreach (String variable in input_variables)
+                                        {
+                                            Type t = map[variable].GetType();
                                             if (t == typeof(Int32))
                                             {
-                                                temp = Convert.ToInt32(s);
-                                                map[temp_identifier] = temp;
+
+                                                try
+                                                {
+                                                    map[variable] = Int32.Parse(input_values[counter++]);
+                                                }
+                                                catch(Exception e)
+                                                {
+                                                    errorMsg.Add("Typing Doesn't Match");
+                                                }
                                             }
                                             else if (t == typeof(double))
                                             {
-                                                temp = Convert.ToDouble(s);
-                                                map[temp_identifier] = temp;
+                                                try
+                                                {
+                                                    map[variable] = Double.Parse(input_values[counter++]);
+                                                }
+                                                catch (Exception e)
+                                                {
+                                                    errorMsg.Add("Typing Doesn't Match");
+                                                }
                                             }
                                             else if (t == typeof(string))
                                             {
-                                                temp = Convert.ToString(s);
-                                                map[temp_identifier] = temp;
+                                                try
+                                                {
+                                                    map[variable] = (input_values[counter++]);
+                                                }
+                                                catch (Exception e)
+                                                {
+                                                    errorMsg.Add("Typing Doesn't Match");
+                                                }
                                             }
                                             else if (t == typeof(char))
                                             {
-                                                temp = s.ToCharArray()[0];
-                                                map[temp_identifier] = temp;
+                                                try
+                                                {
+                                                    map[variable] = Char.Parse(input_values[counter++]);
+                                                }
+                                                catch (Exception e)
+                                                {
+                                                    errorMsg.Add("Typing Doesn't Match");
+                                                }
                                             }
+                                          
                                         }
-                                        else
-                                        {
-                                            errorMsg.Add(string.Format("Variable not initialized at line {0}.", tokens[tCounter].Line + 1));
-                                            //error = -6; //Variable not initialized
-                                            break;
-                                        }
-                                        tCounter++;
-                                        if (tokens[tCounter].Type == TokenType.COMMA)
-                                        {
-                                            tCounter++;
-                                            continue;
-                                        }
-                                        else if (tokens[tCounter].Type == TokenType.IDENTIFIER)
-                                        {
-                                            errorMsg.Add(string.Format("Syntax error. Multiple inputs need a comma in between at line {0}.", tokens[tCounter].Line + 1));
-                                            //error = -8; //Syntax error put comma after a variable to have more than 1 INPUTS
-                                            break;
-                                        }
-                                        else
-                                        {
-                                            break;
-                                        }
-                                    }
-                                    else
-                                    {
-                                        notIden = 1;
                                     }
 
-                                }
-                                if (notIden == 1)
-                                {
-                                    errorMsg.Add(string.Format("Token after INPUT is not a variable name. Error at line {0}.", tokens[tCounter].Line + 1));
-                                    //error = -7;
                                 }
                             }
                             break;
@@ -661,6 +640,10 @@ namespace CFPL_Interpreter
                             string exp3 = "";
                             int par3 = 0;
                             tCounter++;
+                            if (flagif == -1)
+                            {
+                                errorMsg.Add("Invalid ELIF Declaration");
+                            }
                             if (tokens[tCounter].Type == TokenType.LEFT_PAREN) //check the statement
                             {
                                 tCounter++;
@@ -740,7 +723,10 @@ namespace CFPL_Interpreter
                         case TokenType.ELSE:
 
                             //   Console.WriteLine("DASDAS");
-
+                            if (flagif == -1)
+                            {
+                                errorMsg.Add("Invalid ELSE Declaration");
+                            }
                             if (flagif == 0) //if "if statement" is false
                             {
                                 //startcount--;
