@@ -1247,7 +1247,7 @@ namespace CFPL_Interpreter
                     {                       
                        booleanOp(exp);
                     }
-                    if (isboolexp == true && whileRelational ==false)
+                    if (isboolexp == true && whileRelational == false)
                     {
                         Console.WriteLine("isbooleanexp: " + s);
                         if (while_answer == 1)
